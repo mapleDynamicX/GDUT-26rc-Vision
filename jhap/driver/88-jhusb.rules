@@ -1,0 +1,4 @@
+# Rules written by winyio
+# Jinghang Technology vendor ID = 0xa7b7
+KERNEL=="*", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ACTION=="add", ATTR{idVendor}=="a7b7", MODE="666", TAG="jhusb_dev"
+KERNEL=="*", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_device", ACTION=="remove", TAG=="jhusb_dev"
