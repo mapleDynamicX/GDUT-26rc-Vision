@@ -1,0 +1,32 @@
+<launch>
+  
+  <node pkg="yolopkg" type="yolo_detector_node" name="yolo_detector" output="screen">
+    
+    <param name="model_path" value="$(find yolopkg)/best_openvino_model/images_model_yolov5/best"/>
+    <param name="conf_threshold" value="0.5"/>
+    <param name="cls_threshold" value="0.5"/>
+    <param name="iou_threshold" value="0.5"/>
+    <param name="way" value="1"/> <!--0: 发送最佳检测结果  1：发送阈值以上的检测结果-->
+    <param name="image_topic" value="/camera/map_server"/>
+    <param name="queue_size" value="2"/>
+    <param name="num_threads" value="2"/>
+    <param name="classes_num_" value="4"/>
+    <param name="image_init_" value="0"/><!--0: 不订阅  1：订阅-->
+    <param name="pubimage_init_" value="0"/><!--0: 不发布  1：发布-->
+    <param name="class_or_detector_" value="1"/><!--0: class  1：detector-->
+
+    <param name="2model_path" value="$(find yolopkg)/best_openvino_model/images_model_yolov5/best"/>
+    <param name="2conf_threshold" value="0.5"/>
+    <param name="2cls_threshold" value="0.5"/>
+    <param name="2iou_threshold" value="0.5"/>
+    <param name="2way" value="0"/> <!--0: 发送最佳检测结果  1：发送阈值以上的检测结果-->
+    <param name="2image_topic" value="/camera/map_server"/>
+    <param name="2queue_size" value="2"/>
+    <param name="2num_threads" value="2"/>
+    <param name="2classes_num_" value="4"/>
+    <param name="2image_init_" value="0"/>
+    <param name="2pubimage_init_" value="1"/>
+    <param name="2class_or_detector_" value="0"/>
+  </node> 
+
+</launch>

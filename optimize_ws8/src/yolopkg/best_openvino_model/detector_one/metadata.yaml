@@ -1,0 +1,21 @@
+description: Ultralytics YOLO11n model trained on I:\yolo\yolov11proj1\dataset_juanzhou31_one_detect\juanZhou.yaml
+author: Ultralytics
+date: '2025-10-12T05:24:22.661317'
+version: 8.3.109
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: juanzhou
+args:
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  dynamic: false
+  nms: false
