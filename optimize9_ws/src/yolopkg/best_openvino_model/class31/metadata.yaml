@@ -1,0 +1,51 @@
+description: Ultralytics YOLO11n-cls model trained on I:\yolo\yolov11proj_class1\class31_juanzhou
+author: Ultralytics
+date: '2025-10-12T05:22:10.418911'
+version: 8.3.109
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 1
+task: classify
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: f1_1
+  1: f1_2
+  2: f1_3
+  3: f1_4
+  4: f1_5
+  5: f2_1
+  6: f2_2
+  7: f2_3
+  8: f2_4
+  9: f2_5
+  10: f3_1
+  11: f3_2
+  12: f3_3
+  13: f3_4
+  14: f3_5
+  15: r1
+  16: r21_1
+  17: r21_2
+  18: r21_3
+  19: r21_4
+  20: r21_5
+  21: r22_1
+  22: r22_2
+  23: r22_3
+  24: r22_4
+  25: r22_5
+  26: r23_1
+  27: r23_2
+  28: r23_3
+  29: r23_4
+  30: r23_5
+args:
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  dynamic: false
+  nms: false
