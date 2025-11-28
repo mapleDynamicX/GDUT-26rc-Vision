@@ -1,2 +1,0 @@
-set(merge_MESSAGE_FILES "msg/CustomPoint.msg;msg/CustomMsg.msg")
-set(merge_SERVICE_FILES "")

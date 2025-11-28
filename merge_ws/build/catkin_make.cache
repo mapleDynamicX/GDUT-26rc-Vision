@@ -1,2 +1,0 @@
-Point-LIO:livox_ros_driver/livox_ros_driver:livox_ros_driver2-master:merge
--DCATKIN_DEVEL_PREFIX=/home/maple/study2/merge_ws/devel -DCMAKE_INSTALL_PREFIX=/home/maple/study2/merge_ws/install -G Unix Makefiles
