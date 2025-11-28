@@ -1,0 +1,25 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/maple/study2/merge_ws/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/maple/study2/merge_ws/src/merge/include/**",
+        "/home/maple/study2/merge_ws/src/Point-LIO/include/**",
+        "/home/maple/study2/merge_ws/src/livox_ros_driver2-master/src/**",
+        "/home/maple/study2/merge_ws/src/merge/src/livox_ros_driver2/3rdparty/rapidjson/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu17",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}

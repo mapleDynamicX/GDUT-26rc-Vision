@@ -1,0 +1,2 @@
+set(merge_MESSAGE_FILES "/home/maple/study2/merge_ws/src/merge/msg/CustomPoint.msg;/home/maple/study2/merge_ws/src/merge/msg/CustomMsg.msg")
+set(merge_SERVICE_FILES "")
