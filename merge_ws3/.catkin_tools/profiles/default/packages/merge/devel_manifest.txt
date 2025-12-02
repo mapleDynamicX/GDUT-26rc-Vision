@@ -1,0 +1,5 @@
+merge
+/home/maple/study2/merge_ws3/devel/.private/merge/share/merge/cmake/mergeConfig-version.cmake /home/maple/study2/merge_ws3/devel/share/merge/cmake/mergeConfig-version.cmake
+/home/maple/study2/merge_ws3/devel/.private/merge/share/merge/cmake/mergeConfig.cmake /home/maple/study2/merge_ws3/devel/share/merge/cmake/mergeConfig.cmake
+/home/maple/study2/merge_ws3/devel/.private/merge/lib/pkgconfig/merge.pc /home/maple/study2/merge_ws3/devel/lib/pkgconfig/merge.pc
+/home/maple/study2/merge_ws3/devel/.private/merge/lib/merge/merge_node /home/maple/study2/merge_ws3/devel/lib/merge/merge_node
