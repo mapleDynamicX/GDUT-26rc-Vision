@@ -173,9 +173,9 @@ void test11()
 
 void test12()
 {
-    Ten::Ten_lidar::GetInstance("/home/maple/study2/merge_ws7/src/merge/src/livox_ros_driver2/config/MID360_config.json");
-    // Ten::ThreadPool pool(1);
-    // pool.enqueue(laserMapping);
+    Ten::Ten_lidar::GetInstance("/home/maple/study2/merge_ws8/src/merge/src/livox_ros_driver2/config/MID360_config.json");
+    Ten::ThreadPool pool(1);
+    pool.enqueue(test7);
     laserMapping();
     //while (ros::ok()) { usleep(10000); }
     Ten::Ten_lidar::GetInstance().~Ten_lidar();

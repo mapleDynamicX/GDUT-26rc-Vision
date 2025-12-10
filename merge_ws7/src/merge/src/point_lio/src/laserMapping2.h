@@ -286,7 +286,7 @@ void publish_odometry(const ros::Publisher & pubOdomAftMapped)
     }
     set_posestamp(odomAftMapped.pose.pose);
     //////////////////////////////////////////////////////////////////////
-    //Ten::_TF_GET_.write_data(odomAftMapped);
+    Ten::_TF_GET_.write_data(odomAftMapped);
 
     pubOdomAftMapped.publish(odomAftMapped);
 
@@ -324,14 +324,8 @@ int laserMapping()
 {
     //ros::init(argc, argv, "laserMapping");
     ros::NodeHandle nh("~");
-
-    // ros::AsyncSpinner spinner(0);
-    // spinner.start();
-    //std::vector<std::thread> _threads;
-    // _threads.emplace_back(livox_pcl_cbk2);
-    // _threads.emplace_back(imu_cbk2);
     // 注册当前线程到RCU（写线程必须注册）
-    //urcu_memb_register_thread();
+    urcu_memb_register_thread();
 
     readParameters(nh);
     cout<<"lidar_type: "<<lidar_type<<endl;
@@ -1126,11 +1120,7 @@ int laserMapping()
 
 
 
-    //urcu_memb_unregister_thread();
+    urcu_memb_unregister_thread();
 
-    // for (auto& t : _threads)
-    // {
-    //     t.join();
-    // }
     return 0;
 }
