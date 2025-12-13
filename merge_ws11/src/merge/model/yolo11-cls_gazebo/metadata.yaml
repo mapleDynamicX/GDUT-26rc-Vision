@@ -1,0 +1,52 @@
+description: Ultralytics YOLO11s-cls model trained on D:\A_myData\dataset\juanZhou_gazebo5-cls
+author: Ultralytics
+date: '2025-12-12T11:01:18.727479'
+version: 8.3.203
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 1
+task: classify
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: '1'
+  1: '10'
+  2: '11'
+  3: '12'
+  4: '13'
+  5: '14'
+  6: '15'
+  7: '16'
+  8: '17'
+  9: '18'
+  10: '19'
+  11: '2'
+  12: '20'
+  13: '21'
+  14: '22'
+  15: '23'
+  16: '24'
+  17: '25'
+  18: '26'
+  19: '27'
+  20: '28'
+  21: '29'
+  22: '3'
+  23: '30'
+  24: '31'
+  25: '4'
+  26: '5'
+  27: '6'
+  28: '7'
+  29: '8'
+  30: '9'
+args:
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  dynamic: false
+  nms: false
+channels: 3
