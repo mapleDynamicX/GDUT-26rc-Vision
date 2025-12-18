@@ -89,10 +89,13 @@ rosrun camera_calibration cameracalibrator.py \
 ```bash
 #单相机
 rosrun camera_calibration cameracalibrator.py \
-    --size 8x6 \          # 棋盘格内部角点数（宽x高）
-    --square 0.024 \      # 每个方格边长（米）
-    image:=/camera/image_raw \
-    camera:=/camera
+    --size 12x9 \          # 棋盘格内部角点数（宽x高）
+    --square 0.02 \      # 每个方格边长（米）
+    image:=/camera/color/image_raw \
+    camera:=/camera #命名空间
+
+#单相机
+rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.02 image:=/camera/color/image_raw      
 
 #双相机
 rosrun camera_calibration cameracalibrator.py \

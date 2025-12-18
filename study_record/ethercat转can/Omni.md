@@ -178,5 +178,3 @@ std::unordered_map<std::string, hardware_interface::JointHandle>
 - 与 `std::map` 不同：
   - `std::map` 基于红黑树，元素是有序的，查找 O (log n)
   - `std::unordered_map` 基于哈希表，元素无序，查找更快（平均 O (1)）
-
-

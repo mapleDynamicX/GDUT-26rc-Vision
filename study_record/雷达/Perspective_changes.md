@@ -244,5 +244,4 @@ int main() {
     translation(0) = 10.0f;
     std::cout << translation << std::endl;
 }
-
 ```

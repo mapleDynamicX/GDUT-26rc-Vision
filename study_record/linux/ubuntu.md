@@ -226,3 +226,23 @@ sudo journalctl --vacuum-time=2weeks  # 删除两周前的日志
 海康相机SDK导致
 
 sudo rm -rf  /opt/MVS
+
+#### 1. 查看 USB 转串口（优先用这个，绝大多数场景）
+
+打开终端（`Ctrl+Alt+T`），执行命令：
+
+```bash
+ls /dev/ttyUSB*
+```
+
+## 亮度调节
+
+```bash
+sudo gedit /etc/default/grub
+```
+
+找到`GRUB_CMDLINE_LINUX=""`，改为`GRUB_CMDLINE_LINUX="acpi_backlight=vendor"`。
+
+```bash
+sudo update-grub
+```

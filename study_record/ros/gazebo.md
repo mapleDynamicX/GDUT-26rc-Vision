@@ -42,3 +42,21 @@
 > - 无固定基座的自由移动物体（如无人机、空间机器人）
 > - 需要在仿真中自由拖动的物体
 > - SLAM 建图时的初始无约束状态
+
+## 要在 Gazebo 仿真中实时获取并发布机器人的位置，有几种常用方法：
+
+### 1. 使用 Gazebo 提供的模型状态插件（推荐）
+
+在你的 URDF 文件中添加以下插件：
+
+```xml
+<gazebo>
+ <plugin name="gazebo_ros_link_state" filename="libgazebo_ros_p3d.so">
+ <bodyName>base_link</bodyName>
+ <topicName>/robot_pose</topicName>
+ <updateRate>100.0</updateRate>
+ <gaussianNoise>0.001</gaussianNoise>
+ <frameName>world</frameName>
+ </plugin>
+</gazebo>
+```
