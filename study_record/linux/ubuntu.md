@@ -136,7 +136,7 @@ ROS节点的通信主要分为两类，影响差异较大：
 
 ## 安装ros2
 
-```
+```bash
 sudo apt update
 wget http://fishros.com/install -O fishros && bash fishros
 ```
