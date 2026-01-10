@@ -518,14 +518,18 @@ namespace Ten
     }
 
     cv::Mat Ten_zbuffer_simplify::update_debug_image(
-        cv::Mat image,
+        cv::Mat image_in,
         const std::vector<std::vector<surface_2d_point>>& object_2d_points_lists
     ){
+        
         // 1. 检查输入有效性
-        if (image.empty()) {
+        if (image_in.empty()) {
             ROS_WARN("Image is empty, skip draw");
             return cv::Mat();
         }
+
+        cv::Mat image;
+        image_in.copyTo(image);
 
         std::vector<surface_2d_point> object_front_2d = object_2d_points_lists[0];
         std::vector<surface_2d_point> object_side_2d = object_2d_points_lists[1];

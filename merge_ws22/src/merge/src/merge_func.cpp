@@ -455,8 +455,8 @@ void zbuffer()
         sensor_msgs::ImagePtr pub_debug_roi_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", debug_best_roi_image).toImageMsg();
         //调试图像
         //Ten::debug_draw_img(image_in, Ten::_INIT_3D_BOX_.object_2d_points);
-        // cv::Mat debug_raw_img = Ten::_ZBUFFER_SIMPLIFY_.update_debug_image(image_in, Ten::_INIT_3D_BOX_.object_2d_points_);
-        // sensor_msgs::ImagePtr pub_debug_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", debug_raw_img).toImageMsg();
+        cv::Mat debug_raw_img = Ten::_ZBUFFER_SIMPLIFY_.update_debug_image(image_in, Ten::_INIT_3D_BOX_.object_2d_points_);
+        sensor_msgs::ImagePtr pub_debug_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", debug_raw_img).toImageMsg();
         debug_roi_pub.publish(pub_debug_roi_msg);
         // pub_img.publish(pub_debug_img_msg);
 

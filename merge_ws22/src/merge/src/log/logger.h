@@ -87,6 +87,12 @@ namespace Ten
         bool record_image(const std::vector<box>& box_list)
         {
             std::lock_guard<std::mutex> lock(image_mtx_);
+            // 配置 PNG 保存参数：0=无压缩（速度快），1-9=压缩率提升，仍无损
+            std::vector<int> png_params;
+            // 指定 PNG 压缩级别参数
+            png_params.push_back(cv::IMWRITE_PNG_COMPRESSION);
+            // 无压缩，保证数据完全一致
+            png_params.push_back(0);
             //static size_t where = 1;
             static size_t directory_num = 1;
             if(directory_num == 1)
@@ -105,11 +111,11 @@ namespace Ten
             for(size_t i = 0; i < box_list.size(); i++)
             {
                 std::string savePath = directory_ + std::string("/image/") + std::string("image") + std::to_string(directory_num) + std::string("/") + std::string("idx") + std::to_string(box_list[i].idx) + 
-                std::string("cls") + std::to_string(box_list[i].cls) + std::string("conf") + std::to_string(box_list[i].confidence)+std::string(".jpg");
-                std::string savePath_debug = directory_ + std::string("/image/") + std::string("image") + std::to_string(directory_num) + std::string("/")+ std::string("hsv") + std::to_string(box_list[i].idx)+std::string(".jpg");;
-                result = cv::imwrite(savePath, box_list[i].roi_image);
+                std::string("cls") + std::to_string(box_list[i].cls) + std::string("conf") + std::to_string(box_list[i].confidence)+std::string(".png");
+                std::string savePath_debug = directory_ + std::string("/image/") + std::string("image") + std::to_string(directory_num) + std::string("/")+ std::string("hsv") + std::to_string(box_list[i].idx)+std::string(".png");
+                result = cv::imwrite(savePath, box_list[i].roi_image, png_params);
                 cv::Mat img = bgr_color_analysis(box_list[i].roi_image);
-                result2 = cv::imwrite(savePath_debug, img);
+                result2 = cv::imwrite(savePath_debug, img, png_params);
                 if (result && result2) {
                     std::cout << "✅ 基础保存图片成功：" << savePath << std::endl;
                 } else {
