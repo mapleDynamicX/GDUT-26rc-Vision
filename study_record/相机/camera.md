@@ -117,3 +117,9 @@ cv::VideoCapture cap("/dev/video2");
 ```bash
 v4l2-ctl -d /dev/video0 --all#相机详细信息
 ```
+
+```bash
+rosrun camera_calibration cameracalibrator.py --size 11x8 --square 0.02     image:=/camera/color/image_raw 
+
+
+```
