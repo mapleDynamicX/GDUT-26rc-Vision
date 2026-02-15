@@ -1,0 +1,46 @@
+image1:
+yolov5
+min_loss: 21.1959
+top0: 21.1959
+top1: 39.3497
+top2: 100.382
+top3: 100.382
+top4: 100.475
+place: 1,1,1,0,0,1,1,1,0,0,1,1,
+yolov5
+expect_loss: 21.1959
+
+image2:
+yolov5
+min_loss: 65.8565
+top0: 65.8565
+top1: 65.8565
+top2: 65.8565
+top3: 83.7104
+top4: 134.009
+place: 1,1,1,0,0,1,1,1,0,0,1,1,
+yolov5
+expect_loss: 65.8565
+
+
+image1+image2:
+yolov5
+yolov5
+min_loss: 87.0524
+top0: 87.0524
+top1: 839.394
+top2: 839.648
+top3: 839.648
+top4: 907.8
+place: 1,1,1,0,0,1,1,1,0,0,1,1,
+
+//优化过后
+min_loss: 51.7403
+top0: 51.7403
+top1: 817.822
+top2: 820.613
+top3: 841.816
+top4: 906.601
+place: 1,1,1,0,0,1,1,1,0,0,1,1,
+
+
