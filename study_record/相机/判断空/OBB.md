@@ -7,7 +7,6 @@ struct Cube {
     Eigen::Vector3d axes[3];                    // OBB正交轴（世界坐标系）
     Eigen::Vector3d extents;                    // OBB半长度（世界坐标系）
 };
-
 ```
 
 #### 1. `world_corners` - 长方体 8 个角点的世界坐标
@@ -77,5 +76,3 @@ struct Cube {
 | 包围效率   | 差（旋转后包围大量无效空间） | 优（仅包围物体本身）        |
 | 计算复杂度  | 低              | 稍高，但 Slab 算法已大幅优化 |
 | 遮挡检测精度 | 低（易误判相交）       | 高（贴合物体，减少误判）      |
-
-
