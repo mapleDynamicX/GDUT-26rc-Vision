@@ -42,20 +42,15 @@ namespace Ten
                 xyzrpy_error._rpy._roll = 0;
                 xyzrpy_error._rpy._pitch = 0;
                 xyzrpy_error._rpy._yaw = 0;
-                coordinate_transformation_.set_stead_state_error(xyzrpy_error);
-                //设置雷达到车，应为这里标定的雷达相机标定，所以变换到雷达即可...
-                // lidar_to_camera_transform_matrix_ << 
-                // -0.0794166,  -0.996838,  -0.00276348,  0.0197102,  
-                // -0.045364,  0.00638342,  -0.99895,  0.36517,  
-                // 0.995809,  -0.0792079,  -0.0457275,  0.511095,  
-                // 0.0         ,  0.0        ,  0.0        ,  1.0;  
+                //coordinate_transformation_.set_stead_state_error(xyzrpy_error);
+                _CAMERA_TRANSFORMATION_.set_error(xyzrpy_error);
                 lidar_to_camera_transform_matrix_ << 
-                -0.0520106,  -0.998646,  0.000310088,  0.0206641,  
-                -0.0471048,  0.00214311,  -0.998888,  0.396765,  
-                0.997535,  -0.0519674,  -0.0471525,  0.50734,  
+                -0.0293067,  -0.999359,  -0.0205564,  0.0519757,  
+                0.0195515,  0.0199882,  -0.999609,  0.47424,  
+                0.999379,  -0.0296971,  0.0189532,  0.336381,  
                 0.0         ,  0.0        ,  0.0        ,  1.0; 
-
-            }
+                _CAMERA_TRANSFORMATION_.camerainfo_.set_Extrinsic_Matrix(lidar_to_camera_transform_matrix_);
+           }
 
             /**
              * @brief 设置图像for orb
@@ -78,8 +73,9 @@ namespace Ten
                     return;
                 }
                 //设置坐标变换
-                coordinate_transformation_.set_worldtolidar(lidar_of_world1);
-                Ten::XYZRPY lidar_of_world2 = coordinate_transformation_.getXYZRPY();
+                //coordinate_transformation_.set_worldtolidar(lidar_of_world1);
+                _CAMERA_TRANSFORMATION_.set_worldtolidar(lidar_of_world1);
+                Eigen::Matrix4d world_to_camera = _CAMERA_TRANSFORMATION_.getXYZRPY_matrix();
                 // std::cout << "-------------lidar_of_world2--------------" << std::endl; 
                 // std::cout << "x: " << lidar_of_world2._xyz._x << std::endl;
                 // std::cout << "y: " << lidar_of_world2._xyz._y << std::endl;
@@ -88,7 +84,7 @@ namespace Ten
                 // std::cout << "pitch: " << lidar_of_world2._rpy._pitch << std::endl;
                 // std::cout << "yaw: " << lidar_of_world2._rpy._yaw << std::endl;
                 //设置世界到相机
-                Eigen::Matrix4d world_to_camera = lidar_to_camera_transform_matrix_ * worldtocurrent(lidar_of_world2._xyz, lidar_of_world2._rpy);
+                //Eigen::Matrix4d world_to_camera = lidar_to_camera_transform_matrix_ * worldtocurrent(lidar_of_world2._xyz, lidar_of_world2._rpy);
                 // std::cout << "world_to_camera: " << std::endl;
                 // std::cout << world_to_camera << std::endl;
                 transverter_.set_Extrinsic_Matrix(world_to_camera);
@@ -132,8 +128,10 @@ namespace Ten
                     return;
                 }
                 //设置坐标变换
-                coordinate_transformation_.set_worldtolidar(lidar_of_world1);
-                Ten::XYZRPY lidar_of_world2 = coordinate_transformation_.getXYZRPY();
+                //coordinate_transformation_.set_worldtolidar(lidar_of_world1);
+                //Ten::XYZRPY lidar_of_world2 = coordinate_transformation_.getXYZRPY();
+                _CAMERA_TRANSFORMATION_.set_worldtolidar(lidar_of_world1);
+                Eigen::Matrix4d world_to_camera = _CAMERA_TRANSFORMATION_.getXYZRPY_matrix();
                 // std::cout << "---------------------------" << std::endl; 
                 // std::cout << "x: " << lidar_of_world2._xyz._x << std::endl;
                 // std::cout << "y: " << lidar_of_world2._xyz._y << std::endl;
@@ -142,7 +140,7 @@ namespace Ten
                 // std::cout << "pitch: " << lidar_of_world2._rpy._pitch << std::endl;
                 // std::cout << "yaw: " << lidar_of_world2._rpy._yaw << std::endl;
                 //设置世界到相机
-                Eigen::Matrix4d world_to_camera = lidar_to_camera_transform_matrix_ * worldtocurrent(lidar_of_world2._xyz, lidar_of_world2._rpy);
+                //Eigen::Matrix4d world_to_camera = lidar_to_camera_transform_matrix_ * worldtocurrent(lidar_of_world2._xyz, lidar_of_world2._rpy);
                 // std::cout << "world_to_camera: " << std::endl;
                 // std::cout << world_to_camera << std::endl;
                 transverter_.set_Extrinsic_Matrix(world_to_camera);
@@ -178,8 +176,8 @@ namespace Ten
                 //     std::cout << "tvec: " << std::endl;
                 //     std::cout << yolocls_raw_reasoning_image_[i].tvec_ << std::endl;
                 // }
-                log_.record_imageRT(orb_reasoning_image_);
-                log_.record_imageRT(yolocls_raw_reasoning_image_);
+
+                save_logRT();
                 //进行orb推理，返回位置以及损失
                 std::vector<int> place = orb_determine_position_.getplace(orb_reasoning_image_);
                 std::cout << "place: ";
@@ -244,19 +242,19 @@ namespace Ten
                 std::cout << std::endl;
                 std::cout << "oprt.size(): " << oprt.size() << std::endl;
                 //保存旧数据方便调试
-                for(size_t i = 0; i < yolocls_raw_reasoning_image_.size(); i++)
-                {
-                    //世界点和box_list的类对象，对里面数据进行处理
-                    Ten::init_3d_box world_point;
-                    camera_transformation_.camerainfo_.set_RT(yolocls_raw_reasoning_image_[i].rvec_, yolocls_raw_reasoning_image_[i].tvec_);
-                    camera_transformation_.pcl_transform_world_to_camera(world_point.pcl_LM_plum_object_points_, world_point.pcl_C_plum_object_points_, world_point.object_plum_2d_points_);
-                    world_point.pcl_to_C();
-                    zbuffer_.set_exist_boxes(debug_exist_box);
-                    zbuffer_.set_box_lists_(yolocls_raw_reasoning_image_[i].image_, world_point.C_object_plum_points_, world_point.object_plum_2d_points_, world_point.box_lists_);
-                    log_.record_image(world_point.box_lists_);
-                    //设置yolocls推理的12个roi数据
-                    //yolocls_ripe_roi_reasoning_image_.push_back(world_point);
-                }
+                // for(size_t i = 0; i < yolocls_raw_reasoning_image_.size(); i++)
+                // {
+                //     //世界点和box_list的类对象，对里面数据进行处理
+                //     Ten::init_3d_box world_point;
+                //     camera_transformation_.camerainfo_.set_RT(yolocls_raw_reasoning_image_[i].rvec_, yolocls_raw_reasoning_image_[i].tvec_);
+                //     camera_transformation_.pcl_transform_world_to_camera(world_point.pcl_LM_plum_object_points_, world_point.pcl_C_plum_object_points_, world_point.object_plum_2d_points_);
+                //     world_point.pcl_to_C();
+                //     zbuffer_.set_exist_boxes(debug_exist_box);
+                //     zbuffer_.set_box_lists_(yolocls_raw_reasoning_image_[i].image_, world_point.C_object_plum_points_, world_point.object_plum_2d_points_, world_point.box_lists_);
+                //     log_.record_image(world_point.box_lists_);
+                //     //设置yolocls推理的12个roi数据
+                //     //yolocls_ripe_roi_reasoning_image_.push_back(world_point);
+                // }
                 //设置yolocls推理的12个roi数据
                 for(size_t i = 0; i < oprt.size(); i++)
                 {
@@ -309,7 +307,35 @@ namespace Ten
             {
                 //获得这个世界的坐标系在地图坐标系的x,y,z,roll,pitch,yaw
                 Ten::XYZRPY world2toworld1 = relocation_base_of_map_.get_transformation();
-                coordinate_transformation_.set_world2toworld1(world2toworld1);
+                _CAMERA_TRANSFORMATION_.set_world2toworld1(world2toworld1);
+            }
+
+            void use_relocation2()
+            {
+                //获得这个世界的坐标系在地图坐标系的x,y,z,roll,pitch,yaw
+                std::string log_path = std::string(ROOT_DIR) + std::string("map/map.pcd");
+                //std::string log_path = std::string("/home/maple/study2/maple/map/map.pcd");
+                Ten::Ten_relocation<pcl::PointXYZI> rel(log_path);
+                Ten::XYZRPY xyzrpy = rel.get_transformation();
+            
+                std::cout << "---------------------------" << std::endl; 
+                std::cout << "x: " << xyzrpy._xyz._x << std::endl;
+                std::cout << "y: " << xyzrpy._xyz._y << std::endl;
+                std::cout << "z: " << xyzrpy._xyz._z << std::endl;
+                std::cout << "roll: " << xyzrpy._rpy._roll << std::endl;
+                std::cout << "pitch: " << xyzrpy._rpy._pitch << std::endl;
+                std::cout << "yaw: " << xyzrpy._rpy._yaw << std::endl;
+            
+                Ten::XYZRPY xyzrpy_error;
+                xyzrpy_error._xyz._x = 0.035;
+                xyzrpy_error._xyz._y = -0.045;
+                xyzrpy_error._xyz._z = 0.10;
+                xyzrpy_error._rpy._roll = 0;
+                xyzrpy_error._rpy._pitch = 0;
+                xyzrpy_error._rpy._yaw = 0;
+            
+                Ten::XYZRPY world_origin = Ten::transform_matrixtoXYZRPY(Ten::worldtocurrent(xyzrpy._xyz, xyzrpy._rpy) * Ten::worldtocurrent(xyzrpy_error._xyz, xyzrpy_error._rpy) * Ten::_COORDINATE_TRANSFORMATION_.get_lidartocar());
+                Ten::_CAMERA_TRANSFORMATION_.set_world2toworld1(world_origin);
             }
 
             /**
@@ -320,7 +346,18 @@ namespace Ten
             {
                 //获得这个世界的坐标系在地图坐标系的x,y,z,roll,pitch,yaw
                 //Ten::XYZRPY world2toworld1 = relocation_base_of_map_.get_transformation();
-                coordinate_transformation_.set_world2toworld1(world2toworld1);
+                _CAMERA_TRANSFORMATION_.set_world2toworld1(world2toworld1);
+            }
+
+            /**
+             * @brief 保存rt
+             */
+            void save_logRT()
+            {
+                std::string map_path = std::string(ROOT_DIR) + std::string("path/map.txt");
+                std::vector<int> map = Ten::readNumberFile(map_path);
+                log_.record_imageRT(orb_reasoning_image_, map);
+                log_.record_imageRT(yolocls_raw_reasoning_image_, map);
             }
 
 
@@ -336,7 +373,7 @@ namespace Ten
         Ten::ORB::orb_optimize_exhaust orb_determine_position_; //orb处理器，用于判断位置以及优化位姿变换
         Ten::yolo::yolo_v11_cls yolo_detector_; //yolo处理器，用于判断方块类别
         Ten::Ten_worldtocamera camera_transformation_; //坐标点转换器，用于将世界坐标系下的点变换到当前坐标系，以及像素坐标系
-        Ten::Ten_coordinate coordinate_transformation_; //坐标系转换器，用于得到当前坐标系的相对于世界坐标系的坐标
+        //Ten::Ten_coordinate coordinate_transformation_; //坐标系转换器，用于得到当前坐标系的相对于世界坐标系的坐标
         Ten::Ten_relocation<pcl::PointXYZI> relocation_base_of_map_; //重定位处理器，基于点云地图的重定位
         std::vector<int> place_ = {1,1,1,1, 1,1,1,1, 1,1,1,1}; //每个位置是否有方块
         std::vector<int> classifier_ = {0,0,0,0, 0,0,0,0, 0,0,0,0}; //每个位置对应的类别信息，0：未知 、1：R1 、2：R2 、3：fake 、4：空

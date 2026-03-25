@@ -75,6 +75,10 @@ namespace Ten
             return XYZRPYtotransform_matrix(lidartocar_);
         }
 
+        /**
+         * @brief 车相对于世界坐标的位姿
+         * @param Ten::XYZRPY: 车相对于世界坐标的位姿
+         */
         Ten::XYZRPY getXYZRPY()
         {
             std::lock_guard<std::mutex> lock(mtx_);

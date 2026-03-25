@@ -49,6 +49,20 @@ namespace Ten
         }
 
         /**
+         * @brief 车相对于世界坐标的位姿
+         * @param Ten::XYZRPY: 车相对于世界坐标的位姿
+         */
+        Eigen::Matrix4d getXYZRPY_matrix()
+        {
+            std::lock_guard<std::mutex> lock(mtx_);
+            Eigen::Matrix4d T2 = XYZRPYtotransform_matrix(worldtocurrent_);
+            Eigen::Matrix4d T3 = XYZRPYtotransform_matrix(world2toworld1_);
+            Eigen::Matrix4d T1 = camerainfo_.extrinsic();
+            Eigen::Matrix4d mix = T1 * T2 * T3;
+            return mix;
+        }
+
+        /**
          * @brief 将世界点转换到相机坐标和像素坐标
          * @param world: 世界坐标点
          * @param camera: 相机坐标点

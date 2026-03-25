@@ -235,6 +235,7 @@ void vision_test3()
 void test_calibration()
 {
     urcu_memb_register_thread();
+    
     //用于调试rt转换器
     
     //初始化ros调试
@@ -267,7 +268,6 @@ void test_calibration()
 
     Ten::_CAMERA_TRANSFORMATION_.camerainfo_.set_K(K);
     Ten::_CAMERA_TRANSFORMATION_.camerainfo_.set_Extrinsic_Matrix(transform_matrix);
-
     ros::Rate sl(10);
     //zb
     Ten::init_3d_box world_point;
@@ -296,6 +296,7 @@ void test_calibration()
         sensor_msgs::ImagePtr pub_debug_img_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", debug).toImageMsg();
         pub_img.publish(pub_debug_img_msg);
         sl.sleep();
+        
     }
     urcu_memb_unregister_thread();
 }
@@ -589,20 +590,42 @@ void vision_calibration2()
 
 void vision_test_input()
 {
+    urcu_memb_register_thread();
+    Ten::superstratum::super sp_controller;
+    int input = 0;
+    ros::Rate sl(1);
     while(Ten::_TREADPOOL_FLAG_.read_flag())
     {
         int flag = 0;
-        std::cin >> flag;
+        std::cout << "input: " << std::endl;
+        std::cout << "flag: " << std::endl;
+        if(input == 0)
+        {
+            //flag = 0;
+            std::cin >> flag;
+        }
+        
         if(flag == 1)
         {
             std::cout<< "flag == 1" << std::endl;
             vision_calibration2();
         }
+        else if(input != 0 || flag == 2)
+        {
+            input = 3;
+            //flag = 2;
+            std::cout << "flag == 2" << std::endl;
+            sp_controller.set_image_for_yolo();
+            std::cout << "save" << std::endl;
+        }
         else if(flag == 0)
         {
             break;
         }
+        sl.sleep();
     }
+    sp_controller.save_logRT();
+    urcu_memb_unregister_thread();
 }
 
 void test_vision_save()

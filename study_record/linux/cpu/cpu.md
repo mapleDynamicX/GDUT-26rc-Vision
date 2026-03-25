@@ -196,3 +196,136 @@ int main() {
 }
 
 ```
+
+```cpp
+#include <sys/resource.h>
+#include <pthread.h>
+#include <sched.h>
+#include <unistd.h>
+#include <cstring>
+#include <cerrno>
+#include <iostream>
+#include <ros/ros.h>
+
+/**
+ * @brief 绑定当前线程到指定CPU核心（解决CPU密集型线程核心漂移/缓存失效问题）
+ * @param cpu_core 目标CPU核心编号（从0开始，如0/1/2...，需小于系统总核心数）
+ * @return bool true=绑定成功，false=绑定失败（核心非法/权限不足）
+ */
+bool bind_thread_to_cpu(int cpu_core) {
+    // 检查核心编号合法性
+    int cpu_count = sysconf(_SC_NPROCESSORS_ONLN);
+    if (cpu_core < 0 || cpu_core >= cpu_count) {
+        std::cerr << "[错误] CPU核心" << cpu_core << "非法，当前CPU核心数：" << cpu_count << std::endl;
+        return false;
+    }
+
+    cpu_set_t cpuset;
+    CPU_ZERO(&cpuset);
+    CPU_SET(cpu_core, &cpuset);
+    pthread_t tid = pthread_self();
+    int ret = pthread_setaffinity_np(tid, sizeof(cpu_set_t), &cpuset);
+    if (ret != 0) {
+        std::cerr << "[错误] 绑定CPU核心失败：" << std::strerror(ret) << std::endl;
+        return false;
+    }
+
+    std::cout << "[成功] CPU密集线程已绑定到核心：" << cpu_core << std::endl;
+    return true;
+}
+
+/**
+ * @brief 将当前CPU密集型线程设置为低优先级实时调度（避免抢占系统线程，提升计算效率）
+ * @param realtime_priority 实时调度优先级（仅支持10-20，默认15，CPU密集型安全范围）
+ * @param nice_value 普通调度的nice值（仅降级时生效，默认-5，CPU密集型无需依赖）
+ * @return int 0=成功（SCHED_RR实时调度）, 1=降级为nice值调整成功, -1=所有尝试失败
+ * @note 仅适用于CPU密集型线程（纯计算/算法推理），IO密集型线程请勿调用
+ * @note 需sudo运行程序，且系统已配置/etc/security/limits.conf放开rtprio权限
+ */
+int set_thread_as_important(int realtime_priority = 15, int nice_value = -5) {
+    // 1. 校验实时优先级（限定10-20，避免抢占系统核心线程）
+    if (realtime_priority < 10 || realtime_priority > 20) {
+        std::cerr << "[调整] 实时优先级超出CPU密集型安全范围（10-20），已自动修正为15" << std::endl;
+        realtime_priority = 15;
+    }
+    // 2. 校验nice值（限定-10~0，避免普通调度优先级过高）
+    if (nice_value < -10 || nice_value > 0) {
+        std::cerr << "[调整] nice值超出安全范围（-10~0），已自动修正为-5" << std::endl;
+        nice_value = -5;
+    }
+
+    // 3. 获取当前线程ID
+    pthread_t tid = pthread_self();
+
+    // 4. 设置SCHED_RR实时调度（时间片轮转，适合CPU密集型并行）
+    struct sched_param param;
+    std::memset(&param, 0, sizeof(param));
+    param.sched_priority = realtime_priority;
+
+    int ret = pthread_setschedparam(tid, SCHED_RR, &param);
+    if (ret == 0) {
+        // 验证调度策略设置结果
+        int policy;
+        pthread_getschedparam(tid, &policy, &param);
+        const char* policy_name = (policy == SCHED_RR) ? "SCHED_RR" : "UNKNOWN";
+        std::cout << "[成功] CPU密集线程已设为实时调度(" << policy_name << ")，优先级：" 
+                  << param.sched_priority << std::endl;
+        return 0; // 实时调度设置成功
+    }
+
+    // 5. 实时调度失败，降级调整nice值（CPU密集型效果有限，仅兜底）
+    std::cerr << "[提示] 实时调度设置失败(" << std::strerror(ret) 
+              << ")，尝试调整nice值..." << std::endl;
+    
+    if (setpriority(PRIO_PROCESS, 0, nice_value) == 0) {
+        std::cout << "[成功] CPU密集线程nice值已设为：" << nice_value 
+                  << "（普通调度高优先级）" << std::endl;
+        return 1; // nice值调整成功
+    }
+
+    // 6. 所有尝试失败
+    std::cerr << "[失败] 调整nice值也失败：" << std::strerror(errno) << std::endl;
+    std::cerr << "  可能原因：1. 未使用sudo运行 2. 系统权限限制（需配置limits.conf）" << std::endl;
+    return -1; // 全部失败
+}
+
+/**
+ * @brief CPU密集型线程的核心业务函数（示例：纯计算逻辑）
+ * @param arg 线程入参（ROS节点句柄/配置参数等，此处为nullptr）
+ * @return void* 线程返回值（此处为nullptr）
+ * @note 需先绑定CPU核心，再设置实时优先级，顺序不可颠倒
+ */
+void* cpu_intensive_thread_func(void* arg) {
+    ROS_INFO("CPU密集型线程启动，开始初始化优化配置...");
+    
+    // 第一步：绑定到专属CPU核心（避开系统核心0，推荐核心2/3）
+    if (!bind_thread_to_cpu(2)) {
+        ROS_ERROR("CPU核心绑定失败，线程退出！");
+        return nullptr;
+    }
+
+    // 第二步：设置低优先级实时调度（SCHED_RR + 15）
+    int ret = set_thread_as_important(15, -5);
+    if (ret < 0) {
+        ROS_ERROR("CPU密集线程优先级设置失败，线程退出！");
+        return nullptr;
+    }
+
+    // CPU密集型核心逻辑（纯计算示例）
+    long long sum = 0;
+    ros::Rate rate(1); // 低频日志输出，不影响计算
+    while (ros::ok()) {
+        // 模拟大规模计算（10亿次累加）
+        for (long long i = 0; i < 1000000000; ++i) {
+            sum += i;
+        }
+        ROS_INFO_THROTTLE(1, "CPU密集计算完成，sum=%lld，当前运行核心：%d", sum, sched_getcpu());
+        sum = 0; // 重置累加值
+        rate.sleep();
+    }
+    return nullptr;
+}
+
+```
+
+
