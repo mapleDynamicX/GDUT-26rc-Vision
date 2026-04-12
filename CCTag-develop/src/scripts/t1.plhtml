@@ -1,0 +1,59 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <title>Profile main thread</title>
+
+  <style type="text/css">
+    body, html {
+      font-family: sans-serif;
+    }
+
+    .vis-item.popart {
+      background-color: red;
+    }
+  </style>
+
+  <script src="vis.js/dist/vis.js"></script>
+  <link href="vis.js/dist/vis.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+
+<p>
+  Thread/stack profile. MAIN THREAD: [== $main_thread ==]
+</p>
+<p id="selected_function"></p>
+
+<div id="visualization"></div>
+
+<script type="text/javascript">
+  // DOM element where the Timeline will be attached
+  var container = document.getElementById('visualization');
+
+  // Make groups.
+  var groups = new vis.DataSet([== $threads ==]);
+
+  // Create a DataSet (allows two way data-binding)
+  var items = new vis.DataSet([== $profile_data ==]);
+
+  // Configuration for the Timeline
+  var options = {};
+
+  // Create a Timeline
+  var timeline = new vis.Timeline(
+    container,
+    items,
+    groups,
+    {
+      groupOrder: 'content',
+      stack: false
+    });
+
+  // Print full function name on item select.
+  timeline.on('select', function(properties) {
+    var item = items.get(properties.items[0]);
+    var f = document.getElementById('selected_function');
+    f.innerHTML = item.content + "; SAMPLES=" + (item.end - item.start) + "; T=" + (item.t_e - item.t_b)*1e6;
+  });
+</script>
+</body>
+</html>

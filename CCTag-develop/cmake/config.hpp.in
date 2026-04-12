@@ -1,0 +1,37 @@
+/*
+ * Copyright 2016, Simula Research Laboratory
+ *
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at http://mozilla.org/MPL/2.0/.
+ */
+
+#pragma once
+
+#ifndef CCTAG_SERIALIZE
+#cmakedefine CCTAG_SERIALIZE
+#endif
+
+#ifndef CCTAG_VISUAL_DEBUG
+#cmakedefine CCTAG_VISUAL_DEBUG
+#endif
+
+#ifndef CCTAG_NO_COUT
+#cmakedefine CCTAG_NO_COUT
+#endif
+
+#ifndef CCTAG_WITH_CUDA
+#cmakedefine CCTAG_WITH_CUDA
+#endif
+
+#ifdef CCTAG_WITH_CUDA
+
+  #ifndef CCTAG_HAVE_SHFL_DOWN_SYNC
+  #cmakedefine CCTAG_HAVE_SHFL_DOWN_SYNC
+  #endif
+
+  #ifndef CCTAG_NO_THRUST_COPY_IF
+  #cmakedefine CCTAG_NO_THRUST_COPY_IF
+  #endif
+
+#endif

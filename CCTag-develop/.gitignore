@@ -1,0 +1,24 @@
+# build folder
+build*/
+install*/
+# NetBeans project folder
+nbproject
+# Result of the sample code
+sample/result
+sample/cctag3CC
+sample/cctag4CC
+
+# Ignore output files of optpp
+*.out
+
+# Ignore related to the matlab folder
+matlab/syntheticExperiments/figure
+*.m~
+
+# Ignore debug files
+*.txt
+*.ppm
+*.pgm
+
+# frequently changing config file
+mpg-2014-20.cmake
