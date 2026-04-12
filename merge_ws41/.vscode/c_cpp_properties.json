@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/opt/ros/noetic/include/**",
+        "/home/maple/study3/merge_ws41/devel/include/**",
+        "/home/maple/study3/merge_ws41/src/livox_ros_driver/include/**",
+        "/home/maple/study3/merge_ws41/src/livox_ros_driver2/include/**",
+        "/home/maple/study3/merge_ws41/src/merge/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu17",
+      "cppStandard": "c++17"
+    }
+  ],
+  "version": 4
+}
