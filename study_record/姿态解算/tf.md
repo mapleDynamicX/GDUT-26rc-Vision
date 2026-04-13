@@ -128,3 +128,23 @@ void tfCallback(const tf2_msgs::TFMessage::ConstPtr& msg)
     }
 }
 ```
+
+这段代码中使用的 `tf::Matrix3x3::getRPY(roll, pitch, yaw)` 函数，采用的是 **内在旋转（Intrinsic Rotation）**，旋转顺序为：
+
+**Z → Y → X**（即先绕 Z 轴转 Yaw，再绕 Y 轴转 Pitch，最后绕 X 轴转 Roll）。
+
+### 补充说明
+
+1. **对应关系**：
+   
+   - `roll` 绕 X 轴旋转
+   - `pitch` 绕 Y 轴旋转
+   - `yaw` 绕 Z 轴旋转
+
+2. **物理意义**：
+   
+   该顺序等同于先航向（Yaw）、再俯仰（Pitch）、最后横滚（Roll），是机器人 / 无人机领域常用的欧拉角表示方式。
+
+3. **注意事项**：
+   
+   欧拉角存在 ** 万向锁（Gimbal Lock）** 问题（当 Pitch 为 ±90° 时会丢失一个自由度），在高精度计算或任意姿态描述中，建议优先使用四元数或旋转矩阵。

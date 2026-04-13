@@ -59,3 +59,23 @@ rosbag play my_data.bag
 - **过滤话题**：`rosbag record -a --exclude /tf`
 
 需要更详细的示例或者特定场景下的录制方案吗？我可以提供更具体的命令。
+
+### 播放时加上时间戳
+
+```bash
+rosbag play my_data.bag --clock
+```
+
+### 指定播放倍速（控制整体频率）
+
+```bash
+# 基础格式
+rosbag play -r 倍率 你的包.bag
+
+# 常用示例
+rosbag play -r 1.0 test.bag   # 原始速度（默认）
+rosbag play -r 0.5 test.bag   # 0.5倍速（减速，频率减半）
+rosbag play -r 2 test.bag     # 2倍速（加速，频率翻倍）
+rosbag play -r 10 test.bag    # 10倍速快速回放
+
+```
