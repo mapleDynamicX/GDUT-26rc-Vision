@@ -1,0 +1,47 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        // ===================== 方式1：直接调试单个ROS节点（推荐新手）=====================
+        {
+            "name": "ROS1 C++ 调试(直接启动节点)",
+            "type": "cppdbg",
+            "request": "launch",
+            // 🔴 核心：修改为你的节点可执行文件路径！
+            // 格式：${workspaceFolder}/devel/lib/你的包名/你的节点名
+            "program": "${workspaceFolder}/devel/lib/camera/test_node",
+            "args": [], // 节点启动参数（如__name:=my_node，无则留空）
+            "cwd": "${workspaceFolder}",
+            // 🔴 加载ROS环境变量（修改为你的ROS版本：noetic/melodic/kinetic）
+            "environment": [
+                {
+                    "name": "ROS_PACKAGE_PATH",
+                    "value": "${workspaceFolder}/src:/opt/ros/noetic/share"
+                },
+                {
+                    "name": "LD_LIBRARY_PATH",
+                    "value": "/opt/ros/noetic/lib:${workspaceFolder}/devel/lib"
+                }
+            ],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+
+        // ===================== 方式2：调试roslaunch启动的节点（附加进程）=====================
+        {
+            "name": "ROS1 C++ 调试(附加进程)",
+            "type": "cppdbg",
+            "request": "attach",
+            // 🔴 同方式1，修改为你的节点可执行文件路径
+            "program": "${workspaceFolder}/devel/lib/your_package_name/your_node_name",
+            "processId": "${command:pickProcess}", // 手动选择进程
+            "MIMode": "gdb"
+        }
+    ]
+}
