@@ -236,12 +236,11 @@ void publish_frame_world(const ros::Publisher & pubLaserCloudFullRes)
         voxelDownSample(global_cloud_downsampled, second, Ten::_voxeldownsample_threshold_);
         if(second->size() >= 100000)
         {
-            //second->erase(second->begin(), second->begin() + 1000);
             if(global_cloud_downsampled->size() != 50000)
             {
                 global_cloud_downsampled->resize(50000);
             }
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < global_cloud_downsampled->size(); i++)
             {
                 global_cloud_downsampled->points[i].x = second->points[i*2].x;
                 global_cloud_downsampled->points[i].y = second->points[i*2].y;

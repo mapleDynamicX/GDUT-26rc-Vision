@@ -276,7 +276,7 @@ private:
         typename pcl::search::KdTree<PointT>::Ptr tree(new pcl::search::KdTree<PointT>);
         ne.setInputCloud(cloud);
         ne.setSearchMethod(tree);
-        ne.setKSearch(20); // 近邻数，可根据点云密度调整
+        ne.setKSearch(30); // 近邻数，可根据点云密度调整
         //ne.setRadiusSearch(5);
         ne.compute(*normals);
 
@@ -285,7 +285,7 @@ private:
         fpfh.setInputCloud(cloud);
         fpfh.setInputNormals(normals);
         fpfh.setSearchMethod(tree);
-        fpfh.setKSearch(50); // 特征计算近邻数
+        fpfh.setKSearch(100); // 特征计算近邻数
         fpfh.compute(*fpfh_features);
         std::cout << "FPFH特征提取完成，特征维度: " << fpfh_features->size() << std::endl;
     }

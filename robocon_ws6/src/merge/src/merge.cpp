@@ -1,6 +1,6 @@
 //#include "merge_func.cpp"
-// #include "control.cpp"
-#include "vision.cpp"
+#include "control.cpp"
+//#include "vision.cpp"
 #include "./superstratum/controlR2.h"
 #include "./superstratum/super2.h"
 
@@ -140,8 +140,8 @@ void sigintHandler(int sig)
         std::string lidar_path = std::string(ROOT_DIR) + std::string("src/livox_ros_driver2/config/MID360_config.json");
         Ten::Ten_lidar::GetInstance(lidar_path);
         Ten::ThreadPool pool(2);
-        // pool.enqueue(test_calibration);
-        // pool.enqueue(input_code);
+        pool.enqueue(test_lidar);
+        pool.enqueue(test_input);
         laserMapping();
         //vision_test_super1();
         //vision_test_relocation2();

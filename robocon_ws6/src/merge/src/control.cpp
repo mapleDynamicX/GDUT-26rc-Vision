@@ -502,7 +502,7 @@ void test_lidar()
     xyzrpy_car._rpy._roll = 0;
     xyzrpy_car._rpy._pitch = 0;
     xyzrpy_car._rpy._yaw = -M_PI / 2.0;
-    Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car);
+    //Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car);
 
     //Ten::_VELOCITY_TRANSFORMATION_.set_RT(xyzrpy_car);
     // nav_msgs::Odometry odo_n;

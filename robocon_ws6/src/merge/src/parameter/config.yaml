@@ -68,7 +68,7 @@ _max_serial_num_: 10
 # ====================== 重定位参数 ======================
 _voxeldownsample_threshold_for_teaser_: 0.3
 _voxeldownsample_threshold_for_icp_: 0.5
-_setmaxcorrespondencedistance_nano_gicp_: 0.55
+_setmaxcorrespondencedistance_nano_gicp_: 0.60
 _min_num_of_point_cloud_for_relocation_: 20000
 
 #=============建图下采样参数===================
