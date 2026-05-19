@@ -51,7 +51,7 @@ namespace Ten
             Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car); 
             
             //nav_msgs::Odometry odo_n;
-            //ros::Rate sl(100);
+            ros::Rate sl(Ten::_laser_pub_hz_);
             while(Ten::_TREADPOOL_FLAG_.read_flag())
             {
                 nav_msgs::Odometry odo = Ten::_TF_GET_.read_data();
@@ -105,8 +105,8 @@ namespace Ten
         
                 //Ten::Ten_logger::GetInstance("/home/rc/RC_2026/merge_ws21/src/merge/log").record_odometry(odo_n);
         
-                //sl.sleep();
-                usleep(10*1000);
+                sl.sleep();
+                //usleep(10*1000);
             }
             
             urcu_memb_unregister_thread();

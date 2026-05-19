@@ -138,10 +138,11 @@ void sigintHandler(int sig)
         std::string lidar_path = std::string(ROOT_DIR) + std::string("src/livox_ros_driver2/config/MID360_config.json");
         Ten::Ten_lidar::GetInstance(lidar_path);
         Ten::ThreadPool pool(4);
-        //pool.enqueue(Loopcallback);
+        pool.enqueue(Loopcallback);
+        pool.enqueue(test_lidar_point_lio);
         pool.enqueue(test_lidar_ekf_of_point_lio);
         //pool.enqueue(test_lidar_fast_lio);
-        //pool.enqueue(test_input);
+        pool.enqueue(test_input);
         laserMapping();
         //vision_test_super1();
         //vision_test_relocation2();

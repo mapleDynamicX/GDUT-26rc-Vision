@@ -25,9 +25,9 @@ _r1_xyzrpy_init_error_rpy_yaw_: 0.0
 
 
 # ====================== r2 车相对雷达 ======================
-_r2_xyzrpy_car_xyz_x_: -0.126
-_r2_xyzrpy_car_xyz_y_: 0.0
-_r2_xyzrpy_car_xyz_z_: -0.837
+_r2_xyzrpy_car_xyz_x_: 0.340        #0.317327
+_r2_xyzrpy_car_xyz_y_: 0.028            #0.025307
+_r2_xyzrpy_car_xyz_z_: -0.788
 _r2_xyzrpy_car_rpy_roll_: 0.0
 _r2_xyzrpy_car_rpy_pitch_: 0.0
 _r2_xyzrpy_car_rpy_yaw_: 0.0
@@ -45,8 +45,8 @@ _r2_xyzrpy_error_rpy_yaw_: 0.0
 _r2_xyzrpy_init_error_xyz_x_: 0.0
 _r2_xyzrpy_init_error_xyz_y_: 0.0
 _r2_xyzrpy_init_error_xyz_z_: 0.0
-_r2_xyzrpy_init_error_rpy_roll_: 0.0
-_r2_xyzrpy_init_error_rpy_pitch_: 0.0
+_r2_xyzrpy_init_error_rpy_roll_: -0.0012
+_r2_xyzrpy_init_error_rpy_pitch_: -0.5227889
 _r2_xyzrpy_init_error_rpy_yaw_: 0.0
 
 
@@ -106,7 +106,7 @@ lidar_to_camera_32: 0.000000000000000
 lidar_to_camera_33: 1.000000000000000
 
 
-_laser_pub_hz_: 200
+_laser_pub_hz_: 500
 
 
 

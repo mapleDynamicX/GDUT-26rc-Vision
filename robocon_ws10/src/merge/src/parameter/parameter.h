@@ -288,6 +288,9 @@ namespace Ten
             std::cout << "\n--- 雷达到相机外参变换矩阵 (4x4) ---" << std::endl;
             std::cout << Ten::superstratum::_lidar_to_camera_transform_matrix_ << std::endl;
 
+            std::cout << "\n--- 雷达发布频率 ---" << std::endl;
+            std::cout << "_laser_pub_hz_:   " << Ten::_laser_pub_hz_ << std::endl;
+
             std::cout << "\n==========================================================\n" << std::endl;
         }
 

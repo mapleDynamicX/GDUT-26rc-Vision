@@ -65,7 +65,7 @@ namespace Ten
                 Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car);  
                 Ten::_VELOCITY_TRANSFORMATION_.set_RT(xyzrpy_car);
                 //nav_msgs::Odometry odo_n;
-                //ros::Rate sl(100);
+                ros::Rate sl(Ten::_laser_pub_hz_);
                 while(Ten::_TREADPOOL_FLAG_.read_flag())
                 {
                     //位置变化
@@ -103,8 +103,8 @@ namespace Ten
                     arr[8] = car_LA._xyz._z;
                     //id为1
                     serial.serial_send(arr, 1, sizeof(arr));       
-                    //sl.sleep();
-                    usleep(10*1000);
+                    sl.sleep();
+                    //usleep(10*1000);
                 }
                 urcu_memb_unregister_thread();
             }

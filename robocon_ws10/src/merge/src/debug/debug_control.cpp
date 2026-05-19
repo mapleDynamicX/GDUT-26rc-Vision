@@ -28,99 +28,6 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     Ten::_TF_GET2_.write_data(*msg);
 }
 
-
-
-void Loopcallback()
-{
-    ros::NodeHandle nh("/");
-    ros::Subscriber odom_sub = nh.subscribe("/fast_lio2/odom", 10, odomCallback);
-    ros::Rate loop_rate(20);  
-    while (Ten::_TREADPOOL_FLAG_.read_flag())  
-    {
-        ros::spinOnce();  
-        loop_rate.sleep();  
-    }
-}
-
-
-void calibration2()
-{
-    std::string log_path = std::string(ROOT_DIR) + std::string("map/map.pcd");
-    //std::string log_path = std::string("/home/maple/study2/maple/map/map.pcd");
-    Ten::Ten_relocation<pcl::PointXYZI> rel(log_path);
-    Ten::XYZRPY xyzrpy = rel.get_transformation();
-
-    std::cout << "---------------------------" << std::endl; 
-    std::cout << "x: " << xyzrpy._xyz._x << std::endl;
-    std::cout << "y: " << xyzrpy._xyz._y << std::endl;
-    std::cout << "z: " << xyzrpy._xyz._z << std::endl;
-    std::cout << "roll: " << xyzrpy._rpy._roll << std::endl;
-    std::cout << "pitch: " << xyzrpy._rpy._pitch << std::endl;
-    std::cout << "yaw: " << xyzrpy._rpy._yaw << std::endl;
-
-    Ten::XYZRPY xyzrpy_error;
-    xyzrpy_error._xyz._x = 0.025;
-    xyzrpy_error._xyz._y = -0.045;
-    xyzrpy_error._xyz._z = 0.10;
-    xyzrpy_error._rpy._roll = 0;
-    xyzrpy_error._rpy._pitch = 0;
-    xyzrpy_error._rpy._yaw = 0;
-
-    Ten::XYZRPY world_origin = Ten::transform_matrixtoXYZRPY(Ten::worldtocurrent(xyzrpy._xyz, xyzrpy._rpy) * Ten::worldtocurrent(xyzrpy_error._xyz, xyzrpy_error._rpy) * Ten::_COORDINATE_TRANSFORMATION_.get_lidartocar());
-
-    Ten::_COORDINATE_TRANSFORMATION_.set_world2toworld1(world_origin);
-}
-
-void test_input()
-{
-    while(Ten::_TREADPOOL_FLAG_.read_flag())
-    {
-        int flag = 0;
-        std::cin >> flag;
-        if(flag == 1)
-        {
-            std::cout<< "flag == 1" << std::endl;
-            calibration2();
-        }
-        else if(flag == 0)
-        {
-            break;
-        }
-    }
-}
-
-void test_lidar_point_lio()
-{
-    urcu_memb_register_thread();
-
-    ros::Rate sl(1);
-    Ten::XYZRPYFilter coordinate_ft;
-    while (Ten::_TREADPOOL_FLAG_.read_flag())
-    {
-        // 位置变化
-        nav_msgs::Odometry odo = Ten::_TF_GET_.read_data();
-        Ten::XYZRPY pose = Ten::Nav_Odometrytoxyzrpy(odo);
-        Ten::_COORDINATE_TRANSFORMATION_.set_worldtolidar(pose);
-        Ten::XYZRPY result = Ten::_COORDINATE_TRANSFORMATION_.getXYZRPY();
-
-        std::cout << "--------------point_lio_xyzrpy----------" << std::endl;
-
-        std::cout << "x: " << result._xyz._x << std::endl;
-        std::cout << "y: " << result._xyz._y << std::endl;
-        std::cout << "z: " << result._xyz._z << std::endl;
-
-        std::cout << "roll: " << result._rpy._roll << std::endl;
-        std::cout << "pitch: " << result._rpy._pitch << std::endl;
-        std::cout << "yaw: " << result._rpy._yaw << std::endl;
-
-        std::cout << "--------------point_lio_xyzrpy----------" << std::endl;
-
-        sl.sleep();
-    }
-
-    urcu_memb_unregister_thread();
-}
-
 /**
  * @brief 发布 nav_msgs::Odometry 消息（静态发布者，调用一次发一次）
  * @param pv 输入：自定义位姿+速度结构体 Ten::PV
@@ -222,11 +129,133 @@ void publishOdometryFromPVekf(const Ten::PV& pv, const ros::Time& stamp)
 }
 
 
+void Loopcallback()
+{
+    ros::NodeHandle nh("/");
+    ros::Subscriber odom_sub = nh.subscribe("/fast_lio2/odom", 10, odomCallback);
+    ros::Rate loop_rate(20);  
+    while (Ten::_TREADPOOL_FLAG_.read_flag())  
+    {
+        ros::spinOnce();  
+        loop_rate.sleep();  
+    }
+}
+
+
+void calibration2()
+{
+    std::string log_path = std::string(ROOT_DIR) + std::string("map/map.pcd");
+    //std::string log_path = std::string("/home/maple/study2/maple/map/map.pcd");
+    Ten::Ten_relocation<pcl::PointXYZI> rel(log_path);
+    Ten::XYZRPY xyzrpy = rel.get_transformation();
+
+    std::cout << "---------------------------" << std::endl; 
+    std::cout << "x: " << xyzrpy._xyz._x << std::endl;
+    std::cout << "y: " << xyzrpy._xyz._y << std::endl;
+    std::cout << "z: " << xyzrpy._xyz._z << std::endl;
+    std::cout << "roll: " << xyzrpy._rpy._roll << std::endl;
+    std::cout << "pitch: " << xyzrpy._rpy._pitch << std::endl;
+    std::cout << "yaw: " << xyzrpy._rpy._yaw << std::endl;
+
+    Ten::XYZRPY xyzrpy_error;
+    xyzrpy_error._xyz._x = Ten::superstratum::_r1_xyzrpy_error_xyz_x_;
+    xyzrpy_error._xyz._y = Ten::superstratum::_r1_xyzrpy_error_xyz_y_;
+    xyzrpy_error._xyz._z = Ten::superstratum::_r1_xyzrpy_error_xyz_z_;
+    xyzrpy_error._rpy._roll = Ten::superstratum::_r1_xyzrpy_error_rpy_roll_;
+    xyzrpy_error._rpy._pitch = Ten::superstratum::_r1_xyzrpy_error_rpy_pitch_;
+    xyzrpy_error._rpy._yaw = Ten::superstratum::_r1_xyzrpy_error_rpy_yaw_;
+
+    Ten::XYZRPY world_origin = Ten::transform_matrixtoXYZRPY(Ten::worldtocurrent(xyzrpy._xyz, xyzrpy._rpy) * Ten::worldtocurrent(xyzrpy_error._xyz, xyzrpy_error._rpy) * Ten::_COORDINATE_TRANSFORMATION_.get_lidartocar());
+
+    Ten::_COORDINATE_TRANSFORMATION_.set_world2toworld1(world_origin);
+}
+
+void test_input()
+{
+    while(Ten::_TREADPOOL_FLAG_.read_flag())
+    {
+        int flag = 0;
+        std::cin >> flag;
+        if(flag == 1)
+        {
+            std::cout<< "flag == 1" << std::endl;
+            calibration2();
+        }
+        else if(flag == 0)
+        {
+            break;
+        }
+    }
+}
+
+void test_lidar_point_lio()
+{
+    urcu_memb_register_thread();
+    Ten::PV pose_and_velocity_now;
+    //ros::Rate sl(Ten::_laser_pub_hz_);
+    ros::Rate sl(1);
+    Ten::XYZRPYFilter coordinate_ft;
+    Ten::XYZRPY xyzrpy_error;
+    xyzrpy_error._xyz._x = Ten::superstratum::_r2_xyzrpy_init_error_xyz_x_;
+    xyzrpy_error._xyz._y = Ten::superstratum::_r2_xyzrpy_init_error_xyz_y_;
+    xyzrpy_error._xyz._z = Ten::superstratum::_r2_xyzrpy_init_error_xyz_z_;
+    xyzrpy_error._rpy._roll = Ten::superstratum::_r2_xyzrpy_init_error_rpy_roll_;
+    xyzrpy_error._rpy._pitch = Ten::superstratum::_r2_xyzrpy_init_error_rpy_pitch_;
+    xyzrpy_error._rpy._yaw = Ten::superstratum::_r2_xyzrpy_init_error_rpy_yaw_;
+    Ten::_COORDINATE_TRANSFORMATION_.set_stead_state_error(xyzrpy_error);
+
+    Ten::XYZRPY xyzrpy_car;
+    xyzrpy_car._xyz._x = Ten::superstratum::_r2_xyzrpy_car_xyz_x_;
+    xyzrpy_car._xyz._y = Ten::superstratum::_r2_xyzrpy_car_xyz_y_;
+    xyzrpy_car._xyz._z = Ten::superstratum::_r2_xyzrpy_car_xyz_z_;
+    xyzrpy_car._rpy._roll = Ten::superstratum::_r2_xyzrpy_car_rpy_roll_;
+    xyzrpy_car._rpy._pitch = Ten::superstratum::_r2_xyzrpy_car_rpy_pitch_;
+    xyzrpy_car._rpy._yaw = Ten::superstratum::_r2_xyzrpy_car_rpy_yaw_;
+    Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car); 
+    while (Ten::_TREADPOOL_FLAG_.read_flag())
+    {
+        // 位置变化
+        nav_msgs::Odometry odo = Ten::_TF_GET_.read_data();
+        Ten::XYZRPY pose = Ten::Nav_Odometrytoxyzrpy(odo);
+        std::cout << "--------------pose----------" << std::endl;
+
+        std::cout << "x: " << pose._xyz._x << std::endl;
+        std::cout << "y: " << pose._xyz._y << std::endl;
+        std::cout << "z: " << pose._xyz._z << std::endl;
+
+        std::cout << "roll: " << pose._rpy._roll << std::endl;
+        std::cout << "pitch: " << pose._rpy._pitch << std::endl;
+        std::cout << "yaw: " << pose._rpy._yaw << std::endl;
+
+        std::cout << "--------------pose----------" << std::endl;
+        Ten::_COORDINATE_TRANSFORMATION_.set_worldtolidar(pose);
+        Ten::XYZRPY result = Ten::_COORDINATE_TRANSFORMATION_.getXYZRPY();
+        pose_and_velocity_now.pose = result;
+        std::cout << "--------------result----------" << std::endl;
+
+        std::cout << "x: " << result._xyz._x << std::endl;
+        std::cout << "y: " << result._xyz._y << std::endl;
+        std::cout << "z: " << result._xyz._z << std::endl;
+
+        std::cout << "roll: " << result._rpy._roll << std::endl;
+        std::cout << "pitch: " << result._rpy._pitch << std::endl;
+        std::cout << "yaw: " << result._rpy._yaw << std::endl;
+
+        std::cout << "--------------result----------" << std::endl;
+
+        sl.sleep();
+    }
+
+    urcu_memb_unregister_thread();
+}
+
+
+
 
 void test_lidar_ekf_of_point_lio()
 {
     urcu_memb_register_thread();
-    ros::Rate sl(200);
+    ros::Rate sl(Ten::_laser_pub_hz_);
     Ten::PoseVelocityKalmanFilter ekf_fliter;
     Ten::XYZRPYFilter coordinate_ft;
     Ten::PV pose_and_velocity_now;
@@ -238,6 +267,17 @@ void test_lidar_ekf_of_point_lio()
         nav_msgs::Odometry odo = Ten::_TF_GET_.read_data();
         Ten::XYZRPY pose = Ten::Nav_Odometrytoxyzrpy(odo);
         Ten::_COORDINATE_TRANSFORMATION_.set_worldtolidar(pose);
+        std::cout << "--------------pose----------" << std::endl;
+
+        std::cout << "x: " << pose._xyz._x << std::endl;
+        std::cout << "y: " << pose._xyz._y << std::endl;
+        std::cout << "z: " << pose._xyz._z << std::endl;
+
+        std::cout << "roll: " << pose._rpy._roll << std::endl;
+        std::cout << "pitch: " << pose._rpy._pitch << std::endl;
+        std::cout << "yaw: " << pose._rpy._yaw << std::endl;
+
+        std::cout << "--------------pose----------" << std::endl;
         Ten::XYZRPY result = Ten::_COORDINATE_TRANSFORMATION_.getXYZRPY();
         //数据是否无效
         if(result.XYZRPYisnan())
@@ -281,11 +321,39 @@ void test_lidar_fast_lio()
     urcu_memb_register_thread();
     ros::Rate sl(1);
     Ten::XYZRPYFilter coordinate_ft;
+    Ten::XYZRPY xyzrpy_error;
+    xyzrpy_error._xyz._x = Ten::superstratum::_r2_xyzrpy_init_error_xyz_x_;
+    xyzrpy_error._xyz._y = Ten::superstratum::_r2_xyzrpy_init_error_xyz_y_;
+    xyzrpy_error._xyz._z = Ten::superstratum::_r2_xyzrpy_init_error_xyz_z_;
+    xyzrpy_error._rpy._roll = Ten::superstratum::_r2_xyzrpy_init_error_rpy_roll_;
+    xyzrpy_error._rpy._pitch = Ten::superstratum::_r2_xyzrpy_init_error_rpy_pitch_;
+    xyzrpy_error._rpy._yaw = Ten::superstratum::_r2_xyzrpy_init_error_rpy_yaw_;
+    Ten::_COORDINATE_TRANSFORMATION_.set_stead_state_error(xyzrpy_error);
+
+    Ten::XYZRPY xyzrpy_car;
+    xyzrpy_car._xyz._x = Ten::superstratum::_r2_xyzrpy_car_xyz_x_;
+    xyzrpy_car._xyz._y = Ten::superstratum::_r2_xyzrpy_car_xyz_y_;
+    xyzrpy_car._xyz._z = Ten::superstratum::_r2_xyzrpy_car_xyz_z_;
+    xyzrpy_car._rpy._roll = Ten::superstratum::_r2_xyzrpy_car_rpy_roll_;
+    xyzrpy_car._rpy._pitch = Ten::superstratum::_r2_xyzrpy_car_rpy_pitch_;
+    xyzrpy_car._rpy._yaw = Ten::superstratum::_r2_xyzrpy_car_rpy_yaw_;
+    Ten::_COORDINATE_TRANSFORMATION_.set_lidartocar(xyzrpy_car); 
     while (Ten::_TREADPOOL_FLAG_.read_flag())
     {
         // 位置变化
         nav_msgs::Odometry odo = Ten::_TF_GET2_.read_data();
         Ten::XYZRPY pose = Ten::Nav_Odometrytoxyzrpy(odo);
+        std::cout << "--------------pose----------" << std::endl;
+
+        std::cout << "x: " << pose._xyz._x << std::endl;
+        std::cout << "y: " << pose._xyz._y << std::endl;
+        std::cout << "z: " << pose._xyz._z << std::endl;
+
+        std::cout << "roll: " << pose._rpy._roll << std::endl;
+        std::cout << "pitch: " << pose._rpy._pitch << std::endl;
+        std::cout << "yaw: " << pose._rpy._yaw << std::endl;
+
+        std::cout << "--------------pose----------" << std::endl;
         Ten::_COORDINATE_TRANSFORMATION_.set_worldtolidar(pose);
         Ten::XYZRPY result = Ten::_COORDINATE_TRANSFORMATION_.getXYZRPY();
         std::cout << "--------------fast_lio_xyzrpy----------" << std::endl;
