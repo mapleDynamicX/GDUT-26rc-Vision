@@ -338,7 +338,7 @@ namespace Ten
         {
             urcu_memb_register_thread();
             //定义各种数组
-            uint8_t arr[1000] = {0};
+            
 
             //初始化日志
             std::string log_path = std::string(ROOT_DIR) + std::string("log");
@@ -355,6 +355,7 @@ namespace Ten
             //ros::Rate sl(10);
             while(Ten::_TREADPOOL_FLAG_.read_flag())
             {
+                uint8_t arr[1000] = {0};
                 uint8_t frame_id = 0;
                 uint8_t length = 0;
                 if(serial.serial_read(arr, frame_id, length))
@@ -371,6 +372,9 @@ namespace Ten
                         serial.serial_send(result, 5, sizeof(result));       
                     }
 
+                    // std::cout << "frame_id: " << (int)frame_id << std::endl;
+                    // std::cout << "arr[0]: " << (int)(arr[0]) << std::endl;
+
                     if(frame_id == 6) //武器对接
                     {
                         if(arr[0] == 1)
@@ -378,9 +382,12 @@ namespace Ten
                             //如果第一次调用
                             if(pool_request[0] == 0)
                             {
+                                std::cout << "pool_request[0]: " << pool_request[0] << std::endl;
                                 pool.enqueue(func_request[0]);
                             }
                             pool_request[0] = 1;
+                            //uint8_t result[1] = {0};
+                            //serial.serial_send(result, 6, sizeof(result));
                         }
                         else if(arr[0] == 0)
                         {

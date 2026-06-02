@@ -60,7 +60,7 @@
 */
 
 namespace Ten {
-std::atomic<bool> g_apriltag_enabled{false};  // AprilTag 模块使能标志(初始关闭)
+std::atomic<bool> g_apriltag_enabled{true};  // AprilTag 模块使能标志(初始关闭)
 }
 
 namespace Ten {
@@ -454,19 +454,26 @@ class AprilTagProcessor {
 
 /** @brief 串口发送线程主函数: 读相机→位姿估计→NaN检测→串口发送 */
 void serial_send() {
+    std::cout << "serial_send() " << std::endl;
     urcu_memb_register_thread();   // 注册 URCU 线程
     Ten_serial& serial = Ten_serial::GetInstance();   // 串口单例
     Ten_camera& cam = Ten_camera::GetInstance();   // 相机单例, 分辨率与内参标定对齐
+    std::cout << "Ten_camera::GetInstance() " << std::endl;
     cam.reset_camera(APRILTAG_CAMERA_WIDTH, APRILTAG_CAMERA_HEIGHT,APRILTAG_CAMERA_FPS);
     AprilTagProcessor instance;   // AprilTag 处理器实例
     float arr[4] = {0};   // 发送数据: [x, y, z, yaw]
 
     ros::Rate sl(APRILTAG_CAMERA_FPS);   // 60Hz 发送频率
-    while (_APRILTAG_FLAG_.read_flag()) {   // 检查线程池运行标志
-        if (!g_apriltag_enabled.load()) { sl.sleep(); continue; }   // 模块未使能则休眠
+    while (_APRILTAG_FLAG_.read_flag()&&Ten::_TREADPOOL_FLAG_.read_flag()) {
+         // 检查线程池运行标志
+        //std::cout << "_APRILTAG_FLAG_ " << std::endl;
+        //if (!g_apriltag_enabled.load()) { sl.sleep(); continue; }   // 模块未使能则休眠
 
         cv::Mat color = cam.camera_read();   // 读取彩色图像 (阻塞)
-        if (color.empty()) { sl.sleep(); continue; }   // 空帧跳过
+        if (color.empty()) { 
+          std::cout << "color.empty() " << std::endl;
+          sl.sleep(); 
+          continue; }   // 空帧跳过
 
         WorldPose pose = instance.processOneFrame(color, nullptr);   // 执行位姿估计
 
@@ -481,8 +488,10 @@ void serial_send() {
         if (nan_flag) { sl.sleep(); continue; }   // NaN 则丢弃本帧
 
         serial.serial_send(arr, 6, sizeof(arr));   // 串口发送 (设备6, 16字节)
-        printf("[APRILTAG] x=%.3f y=%.3f z=%.3f yaw=%.3f rad\n",
-               arr[0], arr[1], arr[2], arr[3]);
+        // printf("[APRILTAG] x=%.3f y=%.3f z=%.3f yaw=%.3f rad\n",
+        //        arr[0], arr[1], arr[2], arr[3]);
+        std::cout << arr[0] << " " << arr[1] << " " << arr[2] << " " << arr[3];
+
         sl.sleep();   // 按帧率休眠
     }
     urcu_memb_unregister_thread();   // 注销 URCU 线程
