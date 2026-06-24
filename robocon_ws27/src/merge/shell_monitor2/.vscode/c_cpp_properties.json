@@ -1,0 +1,27 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/rc/RC_2026/robocon_ws21/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/FAST-LIVO2-main/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/livox_ros_driver/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/livox_ros_driver2/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/merge/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/rpg_vikit-master/vikit_common/include/**",
+        "/home/rc/RC_2026/robocon_ws21/src/rpg_vikit-master/vikit_ros/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
