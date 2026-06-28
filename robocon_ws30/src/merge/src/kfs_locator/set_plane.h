@@ -239,7 +239,7 @@ namespace Ten::kfs_locator {
 
     inline Eigen::Vector3d Ten_set_plane::cal_base_point(const Plane_Info& plane_info)
     {
-        const double offset_distance = BOX_SIZE;
+        const double offset_distance = BOX_SIZE / 2.0;
 
         // 1. 获取平面法向量
         Eigen::Vector3d normal = plane_info.plane_normal;

@@ -31,6 +31,8 @@ namespace Ten
     void script_controlR1();
     void LoopcallbackR1();
     void R1_mapping_fast();
+    extern const double _vmax_;
+    extern const double _vyawmax_;
 
     namespace superstratum
     {

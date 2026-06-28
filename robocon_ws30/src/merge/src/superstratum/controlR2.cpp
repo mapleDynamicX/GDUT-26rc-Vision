@@ -337,7 +337,7 @@ namespace Ten
                 Ten::_POINT_LIO_RUN_FLAG_.set_flag(false);
             }
 
-            if(v < 0.3 && vyaw <= 0.5)
+            if(v < _vmax_ && vyaw <= _vyawmax_)
             {
                 Ten::_POINT_LIO_CHANGE_FLAG_.set_flag(false);
             }

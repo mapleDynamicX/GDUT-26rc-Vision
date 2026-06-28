@@ -1210,8 +1210,8 @@ void lidarR2_ekf_imu_withprotected()
             //Ten::PV pose_and_velocity_ekf = ekf_fliter.process(pose_and_velocity_now, dt);
             Ten::PV pose_and_velocity_ekf = ekf_fliter.process(pose_and_velocity_now, dt);
             //imu
-            //error = predict.processImu(lidar_LA._xyz, pose_and_velocity_now.pose._rpy);
-            //pose_and_velocity_ekf.pose += error;
+            error = predict.processImu(lidar_LA._xyz, pose_and_velocity_now.pose._rpy);
+            pose_and_velocity_ekf.pose += error;
 
             last_time = curtime;
             pose = pose_and_velocity_ekf.pose;
@@ -1219,7 +1219,7 @@ void lidarR2_ekf_imu_withprotected()
             //变化
             Ten::_COORDINATE_TRANSFORMATION_.set_worldtolidar(pose);
             Ten::XYZRPY result = Ten::_COORDINATE_TRANSFORMATION_.getXYZRPY_incline();
-            pose_and_velocity_ekf.pose = result;
+            //pose_and_velocity_ekf.pose = result;
 
 
             if(Ten::_POINT_LIO_CHANGE_FLAG_.read_flag())
@@ -1237,15 +1237,17 @@ void lidarR2_ekf_imu_withprotected()
 //位置监控
 void tf_monitor(nav_msgs::Odometry msg)
 {
-    static int debug = 10;
+    static int debug = 1;
+    const int count_num = 1;
     Ten::XYZRPY pose_fastlio = Ten::Nav_Odometrytoxyzrpy(msg);
     Ten::PV pose_and_velocity_ekf;
     nav_msgs::Odometry odo;
-    
+    pose_and_velocity_ekf.pose = pose_fastlio;
     if(Ten::_POINT_LIO_RUN_FLAG_.read_flag())
     {
         Ten::XYZRPY pose_point_lio;
         double v = 0;
+        double vyaw = 0;
         ros::Rate sl(Ten::_laser_pub_hz_*2);
         while(Ten::_TREADPOOL_FLAG_.read_flag())
         {
@@ -1257,17 +1259,19 @@ void tf_monitor(nav_msgs::Odometry msg)
             }
             pose_point_lio = Ten::Nav_Odometrytoxyzrpy(odo);
             v = std::sqrt(odo.twist.twist.linear.x*odo.twist.twist.linear.x + odo.twist.twist.linear.y*odo.twist.twist.linear.y);
+            vyaw = std::abs(odo.twist.twist.angular.z);
             break;
         }
         //距离大于某个阈值
         double distance = pose_fastlio.Eclidean_distance(pose_point_lio);
-        //std::cout << "distance: " << distance << std::endl;
+        //std::cout << "v: " << v << std::endl;
+        std::cout << "vyaw: " << vyaw << std::endl;
         if(distance > 1.0)
         {            
             Ten::_POINT_LIO_RUN_FLAG_.set_flag(false);
         }
 
-        if(v < 0.3)
+        if(v < 0.6 && vyaw <= 3.14)
         {
             Ten::_POINT_LIO_CHANGE_FLAG_.set_flag(false);
         }
@@ -1293,11 +1297,11 @@ void tf_monitor(nav_msgs::Odometry msg)
             std::cout << "yaw: " << result._rpy._yaw << std::endl;
             std::cout << "Ayaw: " << result._rpy._yaw * 180 / M_PI << std::endl;
             std::cout << "-------------pose_fastlio--------------" << std::endl; 
-            debug = 10;
+            debug = count_num;
         }
         debug--;
-        pose_and_velocity_ekf.pose = result;
-        publishOdometryFromPVekf(pose_and_velocity_ekf, odo.header.stamp);
+        //pose_and_velocity_ekf.pose = result;
+        publishOdometryFromPVekf(pose_and_velocity_ekf, msg.header.stamp);
     }
 
     if(Ten::_POINT_LIO_RUN_FLAG_.read_flag() && !Ten::_POINT_LIO_CHANGE_FLAG_.read_flag())
@@ -1316,11 +1320,11 @@ void tf_monitor(nav_msgs::Odometry msg)
             std::cout << "yaw: " << result._rpy._yaw << std::endl;
             std::cout << "Ayaw: " << result._rpy._yaw * 180 / M_PI << std::endl;
             std::cout << "-------------pose_fastlio--------------" << std::endl; 
-            debug = 10;
+            debug = count_num;
         }
         debug--;
-        pose_and_velocity_ekf.pose = result;
-        publishOdometryFromPVekf(pose_and_velocity_ekf, odo.header.stamp);
+        //pose_and_velocity_ekf.pose = result;
+        publishOdometryFromPVekf(pose_and_velocity_ekf, msg.header.stamp);
     }
     
 
@@ -1358,7 +1362,7 @@ void odomCallback(const nav_msgs::Odometry::ConstPtr& msg)
     //Ten::_TF_GET2_.write_data(*msg);
     //Ten::_TF_GET2_.push(*msg);
     // Ten::PV pose_and_velocity_now;
-    tfdebug(*msg);
+    tf_monitor(*msg);
 
 }
 

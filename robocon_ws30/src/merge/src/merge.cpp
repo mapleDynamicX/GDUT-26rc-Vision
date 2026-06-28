@@ -148,9 +148,9 @@ void sigintHandler(int sig)
         //pool.enqueue(test_serial);
 
         // pool.enqueue(script_control);
-        pool.enqueue(test_input);
-        pool.enqueue(test_mapping_fast); 
-        // pool.enqueue(lidarR2_ekf_imu_withprotected);
+        //pool.enqueue(test_input);
+        //pool.enqueue(test_mapping_fast); 
+        pool.enqueue(lidarR2_ekf_imu_withprotected);
         pool.enqueue(Loopcallback2);
 
         // pool.enqueue(Ten::script_controlR1);
