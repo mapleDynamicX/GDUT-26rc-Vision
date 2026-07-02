@@ -12,7 +12,7 @@ from nav_msgs.msg import Odometry
 from sensor_msgs.msg import Imu
 from tf.transformations import euler_from_quaternion
 import math
-
+from std_msgs.msg import Float32MultiArray
 
 class MonitorStandalone:
     def __init__(self, master):
@@ -43,9 +43,30 @@ class MonitorStandalone:
         self.precision_btns = {}  # 存储精度选择按钮句柄
         self.monitor_last_process_time = {}  # 存储每个话题上一次真正处理/更新的时间戳
 
-        # 原代码执行顺序
+        # ========== 新增：下位机相关变量与配置 ==========
+        self.lower_topic = "/scripts/liao"  # 下位机数组话题名，可按需修改
+        self.lower_names = ["X", "Y", "Yaw", "激光1", "激光2"]  # 数据名字映射list，可按需增删
+        self.lower_vars = {}
+        self.lower_labels = {}
+        self.lower_last_update = 0.0
+        self.lower_precision = 2
+        self.lower_timeout = 1.5
+        self.lower_block_widgets = []
+
+        # 创建顶部切换栏
+        self.build_switch_buttons()
+
+        # 创建两套界面的独立容器
+        self.upper_container = tk.Frame(self.master, bg='#1e1e1e')
+        self.lower_container = tk.Frame(self.master, bg='#1e1e1e')
+
+        # 分别构建两套界面的内容
         self._load_monitor_json()
-        self.build_monitor_block_content(self.master)
+        self.build_monitor_block_content(self.upper_container)  # 传入上位机容器
+        self.build_lower_block_content(self.lower_container)  # 传入下位机容器
+
+        # 默认展示上位机界面
+        self.upper_container.pack(fill=tk.BOTH, expand=True)
         self._check_monitor_timeout()  # 启动颜色监控循环定时器
 
     def update_ros_status(self, status_type, text, color):
@@ -124,6 +145,119 @@ class MonitorStandalone:
         )
         self.monitor_canvas.bind("<Button-4>", lambda e: self.monitor_canvas.yview_scroll(-1, "units"))
         self.monitor_canvas.bind("<Button-5>", lambda e: self.monitor_canvas.yview_scroll(1, "units"))
+
+    def build_switch_buttons(self):
+        """在顶层构建上位机/下位机切换按钮栏"""
+        switch_frame = tk.Frame(self.master, bg="#2d2d2d")
+        switch_frame.pack(fill=tk.X, padx=10, pady=5)
+
+        self.btn_upper = tk.Button(
+            switch_frame, text="上位机", font=("DejaVu Sans", 30, "bold"),
+            bg="white", fg="black", width=10, command=lambda: self.toggle_interface("upper")
+        )
+        self.btn_upper.pack(side=tk.LEFT, padx=5, pady=5)
+
+        self.btn_lower = tk.Button(
+            switch_frame, text="下位机", font=("DejaVu Sans", 30, "bold"),
+            bg="#44475a", fg="white", width=10, command=lambda: self.toggle_interface("lower")
+        )
+        self.btn_lower.pack(side=tk.LEFT, padx=5, pady=5)
+
+    def toggle_interface(self, target):
+        """切换界面容器的显示与隐藏"""
+        if target == "upper":
+            self.lower_container.pack_forget()
+            self.upper_container.pack(fill=tk.BOTH, expand=True)
+            self.btn_upper.config(bg="white", fg="black")
+            self.btn_lower.config(bg="#44475a", fg="white")
+        else:
+            self.upper_container.pack_forget()
+            self.lower_container.pack(fill=tk.BOTH, expand=True)
+            self.btn_lower.config(bg="white", fg="black")
+            self.btn_upper.config(bg="#44475a", fg="white")
+
+    def build_lower_block_content(self, parent):
+        """构建下位机专属流式布局界面（保持样式完全一致）"""
+        wrap_frame = tk.Frame(parent, bg="#2d2d2d")
+        wrap_frame.pack(fill=tk.BOTH, expand=True, padx=10)
+
+        scrollbar = tk.Scrollbar(wrap_frame, orient=tk.VERTICAL, width=70)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+
+        self.lower_canvas = tk.Canvas(wrap_frame, bg="#2d2d2d", highlightthickness=0, yscrollcommand=scrollbar.set)
+        self.lower_canvas.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+        scrollbar.config(command=self.lower_canvas.yview)
+
+        self.lower_flow_frame = tk.Frame(self.lower_canvas, bg="#2d2d2d")
+        self.lower_flow_window = self.lower_canvas.create_window((0, 0), window=self.lower_flow_frame, anchor="nw")
+
+        # 根据配置的名字映射 list，动态生成与上位机完全一致的 UI 块
+        for name in self.lower_names:
+            block = self._create_single_lower_widget(self.lower_flow_frame, name)
+            self.lower_block_widgets.append(block)
+
+        self.lower_canvas.bind("<Configure>", self._on_lower_canvas_resize)
+        self.lower_flow_frame.bind(
+            "<Configure>",
+            lambda e: self.lower_canvas.config(scrollregion=self.lower_canvas.bbox("all"))
+        )
+        self.lower_canvas.bind("<Button-4>", lambda e: self.lower_canvas.yview_scroll(-1, "units"))
+        self.lower_canvas.bind("<Button-5>", lambda e: self.lower_canvas.yview_scroll(1, "units"))
+
+        # 订阅下位机数组话题
+        sub = rospy.Subscriber(self.lower_topic, Float32MultiArray, self._lower_topic_cb, queue_size=1)
+        self.monitor_subs.append(sub)
+
+    def _create_single_lower_widget(self, parent_container, name):
+        """渲染单个下位机数据块"""
+        block = tk.Frame(parent_container, bg="#383838", bd=2, relief=tk.RAISED, height=320)
+        block.pack_propagate(False)
+
+        tk.Label(block, text=name, bg="#383838", fg="white", font=("DejaVu Sans", 30, "bold")).pack(anchor="w", padx=10,
+                                                                                                    pady=6)
+
+        data_var = tk.StringVar(value="等待下位机数据...")
+        self.lower_vars[name] = data_var
+
+        data_label = tk.Label(
+            block, textvariable=data_var, bg="#282a36", fg="white",
+            font=("DejaVu Sans", 30, "bold"), justify=tk.LEFT, anchor="nw"
+        )
+        data_label.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
+        self.lower_labels[name] = data_label
+
+        def _scroll(e):
+            self.lower_canvas.yview_scroll(-1 if e.num == 4 else 1, "units")
+
+        block.bind("<Button-4>", _scroll)
+        block.bind("<Button-5>", _scroll)
+        for child in block.winfo_children():
+            child.bind("<Button-4>", _scroll)
+            child.bind("<Button-5>", _scroll)
+        return block
+
+    def _lower_topic_cb(self, msg):
+        """下位机数组话题回调函数"""
+        self.lower_last_update = time.time()
+        prec = self.lower_precision
+        # 遍历收到的数组，若多出位自动忽略（通过 zip 截断处理）
+        for val, name in zip(msg.data, self.lower_names):
+            self.lower_vars[name].set(f"{val:.{prec}f}")
+
+    def _on_lower_canvas_resize(self, event):
+        """下位机画布自适应两等分布局逻辑"""
+        canvas_width = event.width
+        if canvas_width <= 1: return
+        cols = 2
+        for i in range(cols):
+            self.lower_flow_frame.columnconfigure(i, weight=1, uniform="lower_cols")
+        new_block_width = max(150, (canvas_width // cols) - 20)
+        for widget in self.lower_block_widgets:
+            widget.grid_forget()
+        for idx, widget in enumerate(self.lower_block_widgets):
+            widget.config(width=new_block_width)
+            widget.grid(row=idx // cols, column=idx % cols, pady=10, sticky="n")
+        self.lower_canvas.itemconfig(self.lower_flow_window, width=canvas_width)
 
     def _create_single_monitor_widget(self, parent_container, item):
         """单个监视UI块与ROS订阅逻辑"""
@@ -212,21 +346,29 @@ class MonitorStandalone:
         self.monitor_canvas.itemconfig(self.monitor_flow_window, width=canvas_width)
 
     def _check_monitor_timeout(self):
-        """主线程定时器：根据时间戳安全更新 UI 字体颜色"""
+        """主线程定时器：同步监控上位机和下位机的数据断流状态"""
         current_time = time.time()
-        timeout_threshold = 0.2  # 超时时间(秒)，大于1秒未更新即判定为断流，变回白色
+        timeout_threshold = self.lower_timeout
+
+        # 1. 原有上位机超时处理不变
         for topic, last_time in self.monitor_last_update.items():
-            if last_time == 0.0:
-                continue  # 还没收到过任何数据，保持白色不变
+            if last_time == 0.0: continue
             label = self.monitor_labels[topic]
-            # 判断是否超时
             if (current_time - last_time) > timeout_threshold:
-                if label.cget("fg") != "white":
-                    label.config(fg="white")
+                if label.cget("fg") != "white": label.config(fg="white")
             else:
-                if label.cget("fg") != "#50fa7b":
-                    label.config(fg="#50fa7b")  # 活跃状态为绿色
-        # 每 200 毫秒循环自检一次，不会阻塞主线程
+                if label.cget("fg") != "#50fa7b": label.config(fg="#50fa7b")
+
+        # 2. 新增下位机超时处理
+        if self.lower_last_update != 0.0:
+            if (current_time - self.lower_last_update) > timeout_threshold:
+                for label in self.lower_labels.values():
+                    if label.cget("fg") != "white": label.config(fg="white")
+            else:
+                for label in self.lower_labels.values():
+                    if label.cget("fg") != "#50fa7b": label.config(fg="#50fa7b")
+
+        # 每 200 毫秒自检一次
         self.master.after(200, self._check_monitor_timeout)
 
     def _change_precision(self, val):

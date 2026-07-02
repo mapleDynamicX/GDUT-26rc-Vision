@@ -2,7 +2,7 @@
 #define __DETECTOR_H_
 
 #include "segmentation.h"
-
+#include "./../yolo/yolo_v11_cls.h"
 
 namespace Ten
 {
@@ -10,6 +10,33 @@ namespace Ten
     class detector
     {
     public:
+        detector()
+        :mode_cls_(std::string(ROOT_DIR)+std::string("model/cls/best"), "cpu", mapping_)
+        {
+
+        }
+
+        std::vector<int> img_dector(std::vector<cv::Mat> images)
+        {
+            if(images.size() != 9)
+            {
+                return std::vector<int>();
+            }
+
+            std::vector<int> cls;
+            cls.resize(9,0);
+
+            for(size_t i = 0; i < images.size(); i++)
+            {
+                std::vector<Ten::yolo::Detection> result = mode_cls_.worker(images[i]);
+                if(result.size() != 0)
+                {
+                    cls[i] = result[0].cls_id_;
+                }
+            }
+
+            return cls;
+        }
 
         /**
          * @brief 按序号批量保存图片，序号从txt读写，支持断点续存
@@ -22,6 +49,10 @@ namespace Ten
         }
 
     private:
+                                    //空 //蓝  //红
+        std::vector<int> mapping_ = {1,  2,    3};
+        Ten::yolo::yolo_v11_cls mode_cls_;
+
         /**
          * @brief 检查目录是否存在，不存在则创建（Linux环境单级目录，父目录需已存在）
          * @param folder_path 目录路径

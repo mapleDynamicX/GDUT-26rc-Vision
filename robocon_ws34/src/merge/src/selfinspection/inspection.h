@@ -68,7 +68,8 @@ namespace Ten
                         continue;
                     }
                     std::vector<cv::Mat> grids = s.getroi(img);
-                    cv::Mat roi_debug = s.debugAssemble3x3Grid(grids);
+                    std::vector<int> results = d.img_dector(grids);
+                    cv::Mat roi_debug = s.debugAssemble3x3Grid(grids,results);
                     cv::imshow("global", img);
                     cv::imshow("roi_debug", roi_debug);
                     cv::waitKey(30);

@@ -146,7 +146,7 @@ void sigintHandler(int sig)
         Ten::Ten_lidar::GetInstance(lidar_path);
         Ten::ThreadPool pool(5);
 
-        // pool.enqueue(test_receiver);
+        //pool.enqueue(serial_liao);
         // pool.enqueue(test_serial);
         // pool.enqueue(script_control);
         // pool.enqueue(test_input);

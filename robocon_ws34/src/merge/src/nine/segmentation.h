@@ -26,11 +26,12 @@ namespace Ten
         }
 
         /**
-         * @brief 调试用：将9张子图按3行3列拼接，最终缩放到640x640返回
+         * @brief 调试用：将9张子图按3行3列拼接，最终缩放到640x640返回；支持在子图中心绘制类别数字
          * @param grids 输入子图集合，顺序要求：从上到下、从左到右（行优先，与分割函数输出顺序完全对应）
+         * @param cls 类别编号集合，长度为9时在对应子图中心绘制绿色数字；长度不为9时仅执行图像拼接
          * @return 拼接并缩放后的640x640图像；数量异常或包含空图时返回640x640纯黑图
          */
-        cv::Mat debugAssemble3x3Grid(const std::vector<cv::Mat>& grids)
+        cv::Mat debugAssemble3x3Grid(const std::vector<cv::Mat>& grids, const std::vector<int>& cls = std::vector<int>())
         {
             // ========== 1. 异常校验：数量不为9直接返回纯黑图 ==========
             if (grids.size() != 9)
@@ -50,9 +51,16 @@ namespace Ten
                 }
             }
 
-            // ========== 3. 以第一张图为基准，统一所有子图尺寸 ==========
+            // ========== 3. 基准参数与绘制配置 ==========
             int cell_width = grids[0].cols;
             int cell_height = grids[0].rows;
+            const bool enable_draw = (cls.size() == 9);
+
+            // 文字绘制通用参数（字体大小自适应子图尺寸）
+            const int font_face = cv::FONT_HERSHEY_SIMPLEX;
+            const double font_scale = std::min(cell_width, cell_height) / 80.0;
+            const int font_thickness = 3;
+            const cv::Scalar text_color(0, 255, 0); // BGR格式：纯绿色
 
             // 创建拼接大图（3行3列）
             cv::Mat big_image(3 * cell_height, 3 * cell_width, grids[0].type());
@@ -63,21 +71,37 @@ namespace Ten
                 for (int col = 0; col < 3; ++col)
                 {
                     int idx = row * 3 + col;
-                    // 计算当前格子在大图中的ROI位置
                     cv::Rect roi_rect(col * cell_width, row * cell_height, cell_width, cell_height);
                     cv::Mat roi = big_image(roi_rect);
 
-                    // 尺寸一致直接复制，不一致则先缩放再复制
+                    // 步骤A：统一子图到基准尺寸（不修改输入原图）
+                    cv::Mat cell_processed;
                     if (grids[idx].cols == cell_width && grids[idx].rows == cell_height)
                     {
-                        grids[idx].copyTo(roi);
+                        cell_processed = grids[idx].clone();
                     }
                     else
                     {
-                        cv::Mat resized_cell;
-                        cv::resize(grids[idx], resized_cell, cv::Size(cell_width, cell_height));
-                        resized_cell.copyTo(roi);
+                        cv::resize(grids[idx], cell_processed, cv::Size(cell_width, cell_height));
                     }
+
+                    // 步骤B：类别列表有效时，在子图正中心绘制数字
+                    if (enable_draw)
+                    {
+                        std::string text = std::to_string(cls[idx]);
+                        int baseline = 0;
+                        cv::Size text_size = cv::getTextSize(text, font_face, font_scale, font_thickness, &baseline);
+
+                        // 精准居中计算：文字原点为左下角
+                        cv::Point text_org;
+                        text_org.x = (cell_width - text_size.width) / 2;
+                        text_org.y = (cell_height + text_size.height) / 2 - baseline;
+
+                        cv::putText(cell_processed, text, text_org, font_face, font_scale, text_color, font_thickness);
+                    }
+
+                    // 步骤C：复制到大图对应网格位置
+                    cell_processed.copyTo(roi);
                 }
             }
 
@@ -86,6 +110,7 @@ namespace Ten
             cv::resize(big_image, result, cv::Size(640, 640), 0, 0, cv::INTER_LINEAR);
             return result;
         }
+
 
     private:
 

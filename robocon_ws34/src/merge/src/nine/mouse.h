@@ -292,6 +292,7 @@ namespace Ten
                 key = cv::waitKey(1000 / 30);
                 if(key == 'q')
                 {
+                    cv::destroyWindow("debugfront");
                     return std::vector<cv::Point2f>();
                 }
                 else if(key == 's')

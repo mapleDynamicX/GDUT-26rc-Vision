@@ -435,3 +435,43 @@ void test_camerahhh()
     test_camera_virtual(deppcamera);
 }
 
+void serial_liao()
+{
+    urcu_memb_register_thread();
+    //定义各种数组
+    ros::NodeHandle nh;
+    ros::Publisher pub_liao = nh.advertise<std_msgs::Float32MultiArray>("/scripts/liao", 10);
+    std::vector<float> data_liao;
+    data_liao.resize(5,0.0f);
+    short data_liao_serial[5] = {0};
+    uint8_t arr[10] = {0,0,0,0,0,0,0,0,0,0};
+ 
+    *((short*)(&(arr[2*0]))) = 10.01*100;
+    *((short*)(&(arr[2*1]))) = 7.23*100;
+    *((short*)(&(arr[2*2]))) = 3.14*100;
+    *((short*)(&(arr[2*3]))) = 80;
+    *((short*)(&(arr[2*4]))) = 100;
+    
+
+    //ros::Rate sl(10);
+    while(Ten::_TREADPOOL_FLAG_.read_flag())
+    {
+        for(size_t i = 0; i < 5; i++)
+        {
+            data_liao_serial[i] = *((short*)(&(arr[2*i])));
+            if(i < 3)
+            {
+                data_liao[i] = static_cast<float>(data_liao_serial[i]) / 100.0;
+            }
+            else
+            {
+                data_liao[i] = static_cast<float>(data_liao_serial[i]);
+            }   
+        }
+        std_msgs::Float32MultiArray msg;
+        msg.data = data_liao;
+        pub_liao.publish(msg);
+        usleep(1000*1000);
+    }
+    urcu_memb_unregister_thread();
+}

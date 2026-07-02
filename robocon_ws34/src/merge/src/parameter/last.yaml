@@ -187,27 +187,43 @@ _r1_red_1_dx_: 0.0
 _r1_red_1_dy_: 0.0
 _r1_red_1_dyaw_: 0.0
 
+_r1_red_2_dx_: 0.0
+_r1_red_2_dy_: 0.0
+_r1_red_2_dyaw_: 0.0
+
 _r1_blue_0_dx_: 0.0
 _r1_blue_0_dy_: 0.0
 _r1_blue_0_dyaw_: 0.0
 
-_r1_blue_1_dx_: 0.0
-_r1_blue_1_dy_: 0.0
+_r1_blue_1_dx_: 0.48
+_r1_blue_1_dy_: -0.48
 _r1_blue_1_dyaw_: 0.0
+
+_r1_blue_2_dx_: 0.48
+_r1_blue_2_dy_: -0.48
+_r1_blue_2_dyaw_: 0.0
 
 _r2_red_0_dx_: 0.0
 _r2_red_0_dy_: 0.0
 _r2_red_0_dyaw_: 0.0
 
-_r2_red_1_dx_: 0.0
-_r2_red_1_dy_: 0.0
+_r2_red_1_dx_: 0.375
+_r2_red_1_dy_: 4.58
 _r2_red_1_dyaw_: 0.0
+
+_r2_red_2_dx_: 0.375
+_r2_red_2_dy_: 4.58
+_r2_red_2_dyaw_: 0.0
 
 _r2_blue_0_dx_: 0.0
 _r2_blue_0_dy_: 0.0
 _r2_blue_0_dyaw_: 0.0
 
-_r2_blue_1_dx_: 0.0
-_r2_blue_1_dy_: 0.0
+_r2_blue_1_dx_: 0.375
+_r2_blue_1_dy_: -4.58
 _r2_blue_1_dyaw_: 0.0
+
+_r2_blue_2_dx_: 0.375
+_r2_blue_2_dy_: -4.58
+_r2_blue_2_dyaw_: 0.0
 

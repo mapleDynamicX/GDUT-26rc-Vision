@@ -1,7 +1,7 @@
 #ifndef __CONTROLR2_H_
 #define __CONTROLR2_H_
 #include "./controlR1.h"
-
+#include <std_msgs/Float32MultiArray.h>
 
 namespace Ten
 {
@@ -521,7 +521,11 @@ namespace Ten
         {
             urcu_memb_register_thread();
             //定义各种数组
-            
+            ros::NodeHandle nh;
+            ros::Publisher pub_liao = nh.advertise<std_msgs::Float32MultiArray>("/scripts/liao", 3);
+            std::vector<float> data_liao;
+            data_liao.resize(5,0.0f);
+            short data_liao_serial[5] = {0};
 
             //初始化日志
             std::string log_path = std::string(ROOT_DIR) + std::string("log");
@@ -535,6 +539,7 @@ namespace Ten
             func_request.push_back(Ten::apriltag_pose_module::serial_send);
             //func_request.push_back(Ten::kfs_detector_controller);
             //func_request.push_back(test_pnp);
+           
 
             //ros::Rate sl(10);
             while(Ten::_TREADPOOL_FLAG_.read_flag())
@@ -617,6 +622,26 @@ namespace Ten
                     if(frame_id == 9) //参数发送
                     {
                         Ten::_PARAMETER_FLAG_.set_flag(0);
+                    }
+
+                    //下位机数据
+                    if(frame_id == 2)
+                    {
+                        for(size_t i = 0; i < 5; i++)
+                        {
+                            data_liao_serial[i] = *((short*)(&(arr[2*i])));
+                            if(i < 3)
+                            {
+                                data_liao[i] = static_cast<float>(data_liao_serial[i]) / 100.0;
+                            }
+                            else
+                            {
+                                data_liao[i] = static_cast<float>(data_liao_serial[i]);
+                            }   
+                        }
+                        std_msgs::Float32MultiArray msg;
+                        msg.data = data_liao;
+                        pub_liao.publish(msg);
                     }
                 }
                 //sl.sleep();

@@ -125,15 +125,10 @@ class TouchscreenUI:
         self.build_left_panel(self.main_frame, col=0)
         # 【注意】请将这里的路径替换为你实际的 9 个数据库文件的具体路径
         self.databases = {
-            (1, 2): r"./official_path/path_12.txt",
-            (1, 3): r"./official_path/path_13.txt",
-            (1, 4): r"./official_path/path_14.txt",
-            (2, 2): r"./official_path/path_22.txt",
-            (2, 3): r"./official_path/path_23.txt",
-            (2, 4): r"./official_path/path_24.txt",
-            (3, 2): r"./official_path/path_32.txt",
-            (3, 3): r"./official_path/path_33.txt",
-            (3, 4): r"./official_path/path_34.txt",
+            (1, 1): r"./challenge_path/path_11.txt",
+            (1, 2): r"./challenge_path/path_12.txt",
+            (2, 1): r"./challenge_path/path_21.txt",
+            (2, 2): r"./challenge_path/path_22.txt",
         }
         self.target_path = r"../path/map.txt"
         # 初始化控制状态（默认发送 1）
@@ -705,13 +700,13 @@ class TouchscreenUI:
             self.table_frame.rowconfigure(i, weight=1)
         tk.Label(self.table_frame, text="R1\\R2", bg="#2d2d2d", fg="black", font=('DejaVu Sans', 25, 'bold')).grid(
             row=0, column=0, sticky='nsew', padx=1, pady=1)
-        for col_idx, r2_cnt in enumerate([2, 3, 4], start=1):
+        for col_idx, r2_cnt in enumerate([1, 2], start=1):
             tk.Label(self.table_frame, text=f"{r2_cnt}个", bg="#2d2d2d", fg="black",
                      font=('DejaVu Sans', 25, 'bold')).grid(row=0, column=col_idx, sticky='nsew', padx=1, pady=1)
-        for row_idx, r1_cnt in enumerate([1, 2, 3], start=1):
+        for row_idx, r1_cnt in enumerate([1, 2], start=1):
             tk.Label(self.table_frame, text=f"{r1_cnt}个", bg="#2d2d2d", fg="black",
                      font=('DejaVu Sans', 25, 'bold')).grid(row=row_idx, column=0, sticky='nsew', padx=1, pady=1)
-            for col_idx, r2_cnt in enumerate([2, 3, 4], start=1):
+            for col_idx, r2_cnt in enumerate([1, 2], start=1):
                 lbl = tk.Label(self.table_frame, text="-", bg="#44475a", fg="white", width=5,
                                font=('DejaVu Sans', 40, 'bold'))
                 lbl.grid(row=row_idx, column=col_idx, sticky='nsew', padx=1, pady=1)
@@ -809,7 +804,7 @@ class TouchscreenUI:
         for state in self.grid_states.values():
             counts[state] += 1
         # 【数量约束】：空(0)=4, R1(1)=3, R2(2)=4, Fake(3)=1
-        qty_ok = (counts[0] == 4 and counts[1] == 3 and counts[2] == 4 and counts[3] == 1)
+        qty_ok = (counts[0] == 7 and counts[1] == 2 and counts[2] == 2 and counts[3] == 1)
         if qty_ok:
             self.qty_constraint_var.set("数量约束：满足")
             self.qty_constraint_label.config(fg="#50fa7b")  # 亮绿色

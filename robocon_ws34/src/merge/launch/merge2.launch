@@ -28,9 +28,9 @@
 	<param name="bash_path" type="string" value="$(find debug)/bash/serial.sh"/>
 	</node>
 	-->
-	<group if="$(arg rviz)">
+	<!-- <group if="$(arg rviz)">
 	<node launch-prefix="nice" pkg="rviz" type="rviz" name="rviz" args="-d $(find merge)/rviz_cfg/loam_livox.rviz" output="screen"/>
-	</group>
+	</group> -->
 	
 	<!--<include file="$(find yolopkg)/launch/yolo.launch" />-->
 	<param name="/roslaunch/child_terminate_timeout" value="$(arg node_exit_timeout)" type="int"/>
