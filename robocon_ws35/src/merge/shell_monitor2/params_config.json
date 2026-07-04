@@ -1,0 +1,10 @@
+{
+  "RedOrBlue": {"name": "红蓝半场", "range": [0, 1], "map":{ "0": "红", "1":"蓝"}, "default": 0},
+  "TookKFSAmount": {"name":"已取方块数","range": [0, 4]},
+  "WeaponAmount": {"name":"已夹武器头数量","range": [0, 1], "default": 0},
+  "IfAssemble": {"name": "是否对接","range": [0, 1], "map": { "0": "否", "1": "是" }, "default": 1},
+  "TakeWhichWeapon": {"name": "夹哪个武器头", "range": [1,6]},
+  "StartPlace": {"name":"启动位置", "range": [0,2], "map": { "0": "斜坡", "1":"一区", "2": "三区"}, "default": 1},
+  "EventChoose": {"name": "赛制选择", "range": [0,2], "map": {"0": "正赛", "1": "一区", "2": "三区"}, "default": 0},
+  "HaveKfs": {"name": "有无体外方块", "range": [0,1], "map": {"0": "无", "1": "有"}, "default": 0}
+}
