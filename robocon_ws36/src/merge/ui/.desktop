@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=启动脚本
+Comment=双击执行的 Shell 脚本
+Exec=bash ./run.sh
+Terminal=true
+Icon=utilities-terminal
+Categories=Utility;

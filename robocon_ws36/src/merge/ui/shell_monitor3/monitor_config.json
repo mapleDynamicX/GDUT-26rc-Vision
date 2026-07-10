@@ -1,0 +1,33 @@
+[
+  {
+  	"name": "r2/odom",
+    "topic": "/R2/odom",
+    "type": "nav_msgs/Odometry",
+    "frequency": 10
+  },
+  {
+  	"name": "r1/odom",
+    "topic": "/R1/odom",
+    "type": "nav_msgs/Odometry",
+    "frequency": 10
+  },
+  {
+    "name": "point_lio/odom",
+    "topic": "/point_lio/odom",
+    "type": "nav_msgs/Odometry",
+    "frequency": 10
+  },
+  {
+    "name": "fast_lio2/odom",
+    "topic": "/fast_lio2/odom",
+    "type": "nav_msgs/Odometry",
+    "frequency": 10
+  },
+  {
+    "name": "livox/imu",
+    "topic": "/livox/imu",
+    "type": "sensor_msgs/Imu",
+    "frequency": 10
+  }
+
+]

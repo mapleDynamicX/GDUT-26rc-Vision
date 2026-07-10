@@ -1,0 +1,10 @@
+[
+    {
+        "name": "运行 merge",
+        "script": "scripts/use2_dynamic.sh"
+    },
+    {
+        "name": "运行 UI",
+        "script": "scripts/control_center_dynamic.sh"
+    }
+]
