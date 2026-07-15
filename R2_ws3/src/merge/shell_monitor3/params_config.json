@@ -1,0 +1,12 @@
+{
+  "RedOrBlue": {"type": "choose", "name": "红蓝半场", "range": [0, 1], "map":{ "0": "红", "1":"蓝"}, "default": 0},
+  "TookKFSAmount": {"type": "choose", "name":"已取方块数","range": [0, 4]},
+  "WeaponAmount": {"type": "choose", "name":"已夹武器头数量","range": [0, 1], "default": 0},
+  "IfAssemble": {"type": "choose", "name": "是否对接","range": [0, 1], "map": { "0": "否", "1": "是" }, "default": 1},
+  "TakeWhichWeapon": {"type": "choose", "name": "夹哪个武器头", "range": [1,6]},
+  "StartPlace": {"type": "choose", "name":"启动位置", "range": [0,2], "map": { "0": "斜坡", "1":"一区", "2": "三区"}, "default": 1},
+  "EventChoose": {"type": "choose", "name": "赛制选择", "range": [0,2], "map": {"0": "正赛", "1": "一区", "2": "三区"}, "default": 0},
+  "HaveKfs": {"type": "choose", "name": "有无体外方块", "range": [0,1], "map": {"0": "无", "1": "有"}, "default": 0},
+  "X": {"type": "number", "name": "x", "scale": 5, "unit": "mm", "default": 0, "limit": [-100, 100]},
+  "Y": {"type": "number", "name": "y", "scale": 5, "unit": "mm", "default": 0, "limit": [-100, 100]}
+}
